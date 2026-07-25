@@ -529,6 +529,19 @@ body {
 .player-car { z-index: 30; transition: none; }
 .player-car.boosting { filter: drop-shadow(0 0 10px #fff08a); }
 .player-car.slowed { filter: grayscale(0.4) brightness(0.85); }
+.player-car.spinning { animation: carspin 0.5s ease; }
+@keyframes carspin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+.hit-mark {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 26px;
+  animation: puff 0.4s ease-in-out infinite;
+}
 .rival-car { opacity: 0.96; }
 
 .wheel { animation: spin 0.35s linear infinite; }

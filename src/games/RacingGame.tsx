@@ -32,6 +32,8 @@ interface Lane {
   dist: number
   boostT: number
   slowT: number
+  spinT: number
+  hits: number
   entities: Entity[]
   spawnT: number
   gifts: number
@@ -52,6 +54,8 @@ function freshLane(offset: number): Lane {
     dist: 0,
     boostT: 0,
     slowT: 0,
+    spinT: 0,
+    hits: 0,
     entities: [],
     spawnT: offset,
     gifts: 0,
@@ -65,12 +69,13 @@ function stepLane(lane: Lane, steer: number, accel: boolean, brake: boolean, dt:
 
   if (lane.boostT > 0) lane.boostT -= dt
   if (lane.slowT > 0) lane.slowT -= dt
+  if (lane.spinT > 0) lane.spinT -= dt
 
   let speed = BASE * speedMul
   if (accel) speed *= 1.8
   if (brake) speed *= 0.45
   if (lane.boostT > 0) speed *= 1.5 // fruit transform boost
-  if (lane.slowT > 0) speed *= 0.6 // obstacle (gentle)
+  if (lane.slowT > 0) speed *= 0.5 // obstacle slow-down
   lane.speed = speed
   lane.dist += speed * dt
 
@@ -80,8 +85,8 @@ function stepLane(lane: Lane, steer: number, accel: boolean, brake: boolean, dt:
 
   lane.spawnT -= dt
   if (lane.spawnT <= 0) {
-    lane.spawnT = 0.6
-    const isFruit = Math.random() < 0.6
+    lane.spawnT = 0.55
+    const isFruit = Math.random() < 0.5
     lane.entities.push({
       id: lane.nextId++,
       type: isFruit ? 'fruit' : 'cone',
@@ -102,7 +107,9 @@ function stepLane(lane: Lane, steer: number, accel: boolean, brake: boolean, dt:
         lane.boostT = 3.0 // score + transform-boost 3s (no free distance)
         lane.gifts += 1
       } else {
-        lane.slowT = 1.5 // slow 1.5s
+        lane.slowT = 2.0 // slow 2s
+        lane.spinT = 0.5 // spin-out feedback
+        lane.hits += 1
       }
     }
   }
@@ -325,7 +332,7 @@ export default function RacingGame({ onExit }: { onExit: () => void }) {
 
           {/* tiny control hints in the corners */}
           <div className="key-hint hint-left">
-            1P：← → 轉向 · ↓ 加速 · PgDn 減速
+            1P：← → 轉向 · ↓ 加速 · PgDn 減速 · 閃避 🚧
           </div>
           <div className="key-hint hint-right">
             {mode === '2p' ? '2P：A D 轉向 · S 加速 · X 減速' : '電腦 🤖 自動駕駛'}
@@ -394,11 +401,12 @@ function LaneView({
           </div>
         ))}
         <div
-          className={`race-car player-car ${lane.boostT > 0 ? 'boosting' : ''} ${lane.slowT > 0 ? 'slowed' : ''}`}
+          className={`race-car player-car ${lane.boostT > 0 ? 'boosting' : ''} ${lane.slowT > 0 ? 'slowed' : ''} ${lane.spinT > 0 ? 'spinning' : ''}`}
           style={{ left: `${lane.x * 100}%`, top: `${CAR_Y * 100}%` }}
         >
           <RaceCarArt racer={racer} car={car} number={cpu ? 11 : 7} />
           {lane.boostT > 0 && <span className="boost-flame">💨</span>}
+          {lane.spinT > 0 && <span className="hit-mark">💥</span>}
         </div>
       </div>
     </div>
