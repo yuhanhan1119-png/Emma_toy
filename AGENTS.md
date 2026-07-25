@@ -2,8 +2,11 @@
 
 A small collection of Sanrio-style mini-games behind a game-selection menu:
 
-1. 尋找可愛夥伴 (Kawaii Seek) — a "Where's Waldo"-style hidden-object game.
-   15 levels, 3 minutes each, increasing difficulty.
+1. 尋找可愛夥伴 (Kawaii Seek) — a "Where's Waldo"-style hidden-object game whose
+   cast is 大耳狗 / 布丁狗 variants (each with a unique accessory). 15 levels,
+   3 minutes each, increasing difficulty. Roster lives in `src/characters.tsx`
+   (`CHARACTERS` = base 'cinna'/'purin' + an accessory); add variants there and
+   the levels/scene pick them up automatically via `ALL_IDS`.
 2. 可愛賽車大賽 (Kawaii Racing) — 大耳狗 vs 布丁狗 two-lane car race set in
    Mt. Fuji with cycling four-season scenery. Setup: pick character → mode
    (單人對電腦 / 雙人對戰) → car (Toyota/Mazda/Honda classic styles) → 遊戲開始.
