@@ -4,8 +4,13 @@ A small collection of Sanrio-style mini-games behind a game-selection menu:
 
 1. 尋找可愛夥伴 (Kawaii Seek) — a "Where's Waldo"-style hidden-object game.
    15 levels, 3 minutes each, increasing difficulty.
-2. 可愛賽車大賽 (Kawaii Racing) — 大耳狗 vs 布丁狗 top-down car race: steer to
-   dodge obstacles (🚧), grab gifts (🎁) for a speed boost, beat the rival to 🏁.
+2. 可愛賽車大賽 (Kawaii Racing) — 大耳狗 vs 布丁狗 two-lane car race set in
+   Mt. Fuji with cycling four-season scenery. Setup: pick character → mode
+   (單人對電腦 / 雙人對戰) → car (Toyota/Mazda/Honda classic styles) → 遊戲開始.
+   Steer to grab fruits (🍓, +score & 3s speed boost) and dodge obstacles
+   (🚧, 1.5s slow), first to 🏁 within the 3-minute cap wins.
+   Controls — 1P: ← → steer, ↓ accelerate, PgDn brake. 2P: A/D steer, S accel,
+   X brake. Cars auto-cruise forward; accelerate is a bonus.
 
 ## Tech stack
 
@@ -40,7 +45,11 @@ A small collection of Sanrio-style mini-games behind a game-selection menu:
   characters that are NOT targets (see `src/scene.ts`), so "find N of X" is always
   satisfiable and unambiguous. Keep that invariant if editing scene generation.
 - The racing game runs its simulation loop with `requestAnimationFrame`, keeping
-  mutable state in a `useRef` (`RaceState`) and forcing re-render each frame via a
-  `frame` counter. React StrictMode double-invokes effects in dev; the loop guards
-  against this by cancelling the previous `rAF` in the effect cleanup. Tune pace via
-  the `PLAYER_BASE` / rival-speed constants at the top of `src/games/RacingGame.tsx`.
+  each lane's mutable state in a `useRef` (`Lane`) and forcing re-render each frame
+  via a `frame` counter. React StrictMode double-invokes effects in dev; the loop
+  guards against this by cancelling the previous `rAF` in the effect cleanup.
+- Racing balance is tuned via constants at the top of `src/games/RacingGame.tsx`:
+  `BASE` (auto-cruise speed), `CPU_CRUISE` (CPU speed multiplier, intentionally
+  <1 to stay beginner-friendly), `FINISH` (race distance) and `RACE_SECONDS`
+  (3-minute cap). It is intentionally easy to win; raise `CPU_CRUISE` toward 1.0
+  to make the CPU harder.
