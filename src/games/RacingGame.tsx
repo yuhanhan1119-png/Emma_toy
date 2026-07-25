@@ -70,7 +70,7 @@ function stepLane(lane: Lane, steer: number, accel: boolean, brake: boolean, dt:
   if (accel) speed *= 1.8
   if (brake) speed *= 0.45
   if (lane.boostT > 0) speed *= 1.5 // fruit transform boost
-  if (lane.slowT > 0) speed *= 0.5 // obstacle
+  if (lane.slowT > 0) speed *= 0.6 // obstacle (gentle)
   lane.speed = speed
   lane.dist += speed * dt
 
@@ -81,7 +81,7 @@ function stepLane(lane: Lane, steer: number, accel: boolean, brake: boolean, dt:
   lane.spawnT -= dt
   if (lane.spawnT <= 0) {
     lane.spawnT = 0.6
-    const isFruit = Math.random() < 0.48
+    const isFruit = Math.random() < 0.6
     lane.entities.push({
       id: lane.nextId++,
       type: isFruit ? 'fruit' : 'cone',
@@ -102,7 +102,7 @@ function stepLane(lane: Lane, steer: number, accel: boolean, brake: boolean, dt:
         lane.boostT = 3.0 // score + transform-boost 3s (no free distance)
         lane.gifts += 1
       } else {
-        lane.slowT = 2.0 // slow 2s
+        lane.slowT = 1.5 // slow 1.5s
       }
     }
   }
