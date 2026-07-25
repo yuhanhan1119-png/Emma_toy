@@ -6,8 +6,9 @@ type Phase = 'setup' | 'countdown' | 'racing' | 'result'
 type Mode = 'cpu' | '2p'
 type SetupStep = 'main' | 'car'
 
-const FINISH = 280 // race distance
-const BASE = 1.6 // % per second cruising
+const FINISH = 170 // race distance
+const BASE = 2.6 // % per second auto-cruise (car moves without holding accel)
+const CPU_CRUISE = 0.6 // CPU cruises slower so the game stays beginner-friendly/winnable
 const STEER = 0.9
 const CAR_Y = 0.82
 const HIT_X = 0.12
@@ -59,17 +60,17 @@ function freshLane(offset: number): Lane {
   }
 }
 
-function stepLane(lane: Lane, steer: number, accel: boolean, brake: boolean, dt: number) {
+function stepLane(lane: Lane, steer: number, accel: boolean, brake: boolean, dt: number, speedMul = 1) {
   lane.x = Math.max(0.08, Math.min(0.92, lane.x + steer * STEER * dt))
 
   if (lane.boostT > 0) lane.boostT -= dt
   if (lane.slowT > 0) lane.slowT -= dt
 
-  let speed = BASE
+  let speed = BASE * speedMul
   if (accel) speed *= 1.8
   if (brake) speed *= 0.45
   if (lane.boostT > 0) speed *= 1.5 // fruit transform boost
-  if (lane.slowT > 0) speed *= 0.4 // obstacle
+  if (lane.slowT > 0) speed *= 0.5 // obstacle
   lane.speed = speed
   lane.dist += speed * dt
 
@@ -98,18 +99,16 @@ function stepLane(lane: Lane, steer: number, accel: boolean, brake: boolean, dt:
     if (Math.abs(e.y - CAR_Y) < HIT_Y && Math.abs(e.x - lane.x) < HIT_X) {
       e.hit = true
       if (e.type === 'fruit') {
-        lane.boostT = 3.0 // transform-boost 3s
-        lane.dist += 2.2
+        lane.boostT = 3.0 // score + transform-boost 3s (no free distance)
         lane.gifts += 1
       } else {
-        lane.slowT = 3.0 // slow 3s
-        lane.dist = Math.max(0, lane.dist - 1.4)
+        lane.slowT = 2.0 // slow 2s
       }
     }
   }
 }
 
-function cpuSteer(lane: Lane): { steer: number; accel: boolean } {
+function cpuSteer(lane: Lane): number {
   let target: Entity | null = null
   let best = Infinity
   for (const e of lane.entities) {
@@ -122,11 +121,10 @@ function cpuSteer(lane: Lane): { steer: number; accel: boolean } {
       }
     }
   }
-  if (!target) return { steer: 0, accel: true }
+  if (!target) return 0
   const dir = target.x > lane.x ? 1 : -1
-  if (target.type === 'fruit')
-    return { steer: Math.abs(target.x - lane.x) > 0.03 ? dir : 0, accel: true }
-  return { steer: Math.abs(target.x - lane.x) < 0.2 ? -dir : 0, accel: true }
+  if (target.type === 'fruit') return Math.abs(target.x - lane.x) > 0.03 ? dir : 0
+  return Math.abs(target.x - lane.x) < 0.2 ? -dir : 0
 }
 
 export default function RacingGame({ onExit }: { onExit: () => void }) {
@@ -229,14 +227,13 @@ export default function RacingGame({ onExit }: { onExit: () => void }) {
       const b = laneB.current
 
       const steerA = (keysA.current.left ? -1 : 0) + (keysA.current.right ? 1 : 0)
-      stepLane(a, steerA, keysA.current.accel, keysA.current.brake, dt)
+      stepLane(a, steerA, keysA.current.accel, keysA.current.brake, dt, 1)
 
       if (modeRef.current === '2p') {
         const steerB = (keysB.current.left ? -1 : 0) + (keysB.current.right ? 1 : 0)
-        stepLane(b, steerB, keysB.current.accel, keysB.current.brake, dt)
+        stepLane(b, steerB, keysB.current.accel, keysB.current.brake, dt, 1)
       } else {
-        const ai = cpuSteer(b)
-        stepLane(b, ai.steer, ai.accel, false, dt)
+        stepLane(b, cpuSteer(b), false, false, dt, CPU_CRUISE)
       }
 
       if (a.dist >= FINISH || b.dist >= FINISH || raceLeft.current <= 0) {
