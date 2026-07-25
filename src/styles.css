@@ -300,6 +300,11 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 .sprite svg { width: 100%; height: 100%; display: block; }
+
+/* gentle idle animation for characters (menus, find panel); disabled on the
+   dense board for readability + performance) */
+.kw-bob { animation: bob 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.board .kw-bob { animation: none; }
 .sprite:hover { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.25)); }
 
 .sprite.found {

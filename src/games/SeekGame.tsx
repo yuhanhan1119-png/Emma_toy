@@ -152,7 +152,7 @@ function StartScreen({ onStart, onExit }: { onStart: () => void; onExit: () => v
     <main className="screen center card-pop">
       <div className="hero">
         <div className="hero-row">
-          {(['cat', 'bunny', 'batbunny', 'pudding', 'penguin'] as CharacterId[]).map((id) => (
+          {(['cinna', 'cinnaBow', 'purin', 'purinGlasses', 'cinnaStar'] as CharacterId[]).map((id) => (
             <div key={id} className="hero-char" title={CHARACTERS[id].name}>
               <CharacterArt id={id} />
             </div>

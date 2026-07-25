@@ -34,9 +34,9 @@ function Menu({ onPick }: { onPick: (s: Screen) => void }) {
         <div className="menu-grid">
           <button className="menu-card" onClick={() => onPick('seek')}>
             <div className="menu-icons">
-              <div className="menu-icon"><CharacterArt id="cat" /></div>
-              <div className="menu-icon"><CharacterArt id="bunny" /></div>
-              <div className="menu-icon"><CharacterArt id="pudding" /></div>
+              <div className="menu-icon"><CharacterArt id="cinna" /></div>
+              <div className="menu-icon"><CharacterArt id="purin" /></div>
+              <div className="menu-icon"><CharacterArt id="cinnaBow" /></div>
             </div>
             <h2>尋找可愛夥伴</h2>
             <p>在人群中找出指定角色！15 關、每關 3 分鐘的找找看。</p>
