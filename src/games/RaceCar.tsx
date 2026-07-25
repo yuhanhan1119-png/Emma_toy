@@ -1,12 +1,22 @@
-// Original animated race-car mascots (Sanrio-inspired, not official artwork).
-// 大耳狗 (cinna): white long-eared puppy in a sky-blue car.
-// 布丁狗 (pudding): golden pudding puppy with a brown beret in a yellow car.
+// Original animated race-car mascots (Sanrio-inspired characters + original
+// classic-car bodies inspired by Toyota / Mazda / Honda liveries).
+// No official Sanrio, Toyota, Mazda or Honda artwork or logos are used.
 
 export type Racer = 'cinna' | 'pudding'
+export type CarType = 'toyota' | 'mazda' | 'honda'
 
-export const RACERS: Record<Racer, { name: string; car: string; color: string }> = {
-  cinna: { name: '大耳狗', car: '#8fd0ff', color: '#6cbdf2' },
-  pudding: { name: '布丁狗', car: '#ffd766', color: '#eabf4d' },
+export const RACERS: Record<Racer, { name: string }> = {
+  cinna: { name: '大耳狗' },
+  pudding: { name: '布丁狗' },
+}
+
+export const CAR_TYPES: Record<
+  CarType,
+  { name: string; body: string; dark: string; accent: string }
+> = {
+  toyota: { name: 'Toyota 經典', body: '#e8352b', dark: '#c02016', accent: '#ffffff' },
+  mazda: { name: 'Mazda 經典', body: '#1f8f4e', dark: '#146336', accent: '#ff7a1a' },
+  honda: { name: 'Honda 經典', body: '#1e73d6', dark: '#1457a8', accent: '#ffffff' },
 }
 
 function Wheels() {
@@ -62,22 +72,47 @@ function PuddingHead() {
   )
 }
 
-export function RaceCarArt({ racer }: { racer: Racer }) {
-  const c = RACERS[racer]
+export function RaceCarArt({
+  racer,
+  car = 'toyota',
+  number,
+}: {
+  racer: Racer
+  car?: CarType
+  number?: number
+}) {
+  const c = CAR_TYPES[car]
   return (
-    <svg viewBox="0 0 120 92" role="img" aria-label={c.name}>
+    <svg viewBox="0 0 120 92" role="img" aria-label={`${RACERS[racer].name} - ${c.name}`}>
       <ellipse cx="60" cy="86" rx="46" ry="6" fill="rgba(0,0,0,0.12)" />
+      {/* rear spoiler */}
+      <rect x="18" y="44" width="84" height="5" rx="2" fill={c.dark} />
+      <rect x="24" y="40" width="5" height="8" fill={c.dark} />
+      <rect x="91" y="40" width="5" height="8" fill={c.dark} />
       <Wheels />
       {/* car body */}
       <path
         d="M14 66 Q10 50 26 48 L40 48 Q48 40 60 40 Q72 40 80 48 L94 48 Q110 50 106 66 Q108 74 96 74 L24 74 Q12 74 14 66 Z"
-        fill={c.car}
-        stroke={c.color}
+        fill={c.body}
+        stroke={c.dark}
         strokeWidth="2"
       />
+      {/* racing stripe */}
+      <rect x="56" y="46" width="8" height="28" fill={c.accent} opacity="0.85" />
+      {/* windshield */}
       <path d="M46 48 Q52 43 60 43 Q68 43 74 48 Z" fill="#eafaff" opacity="0.9" />
-      <rect x="20" y="62" width="80" height="5" rx="2.5" fill="rgba(255,255,255,0.5)" />
+      <rect x="20" y="62" width="80" height="5" rx="2.5" fill="rgba(255,255,255,0.4)" />
+      {/* headlight */}
       <circle cx="24" cy="60" r="3.5" fill="#fff6c2" stroke="#f0d24a" />
+      {/* racing number roundel */}
+      {number != null && (
+        <g>
+          <circle cx="90" cy="63" r="8" fill="#fff" stroke={c.dark} strokeWidth="1.5" />
+          <text x="90" y="66.5" textAnchor="middle" fontSize="10" fontWeight="900" fill={c.dark}>
+            {number}
+          </text>
+        </g>
+      )}
       {racer === 'cinna' ? <CinnaHead /> : <PuddingHead />}
     </svg>
   )
