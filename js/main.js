@@ -1,5 +1,6 @@
 import { CHARACTERS, BATTLE_MAX_HP, ENERGY_TO_ULTIMATE, getRandomCharacter } from './characters.js';
 import { ActionArena } from './arena.js';
+import { createSpriteCanvas } from './sprites.js';
 
 const screens = {
   opening: document.getElementById('opening-scene'),
@@ -49,11 +50,15 @@ function renderCharCard(charId, selected, onClick) {
   const char = CHARACTERS[charId];
   const card = document.createElement('button');
   card.className = `char-select-card${selected === charId ? ' selected' : ''}`;
-  card.innerHTML = `
-    <div class="char-sprite ${charId}"></div>
+  const sprite = createSpriteCanvas(charId, 72);
+  const info = document.createElement('div');
+  info.className = 'char-card-info';
+  info.innerHTML = `
     <span class="char-select-name">${char.name}</span>
     <span class="char-select-stats">生命 ${BATTLE_MAX_HP}</span>
   `;
+  card.appendChild(sprite);
+  card.appendChild(info);
   card.addEventListener('click', () => onClick(charId));
   return card;
 }
@@ -206,6 +211,23 @@ function initBattleControls() {
   });
 }
 
+function initSprites() {
+  document.querySelectorAll('[data-char] .char-sprite, .char-card[data-char]').forEach((el) => {
+    const parent = el.closest('[data-char]');
+    if (!parent) return;
+    const charId = parent.dataset.char;
+    const size = parent.classList.contains('menu-char') ? 64
+      : parent.classList.contains('char-card') ? 80 : 72;
+    const canvas = createSpriteCanvas(charId, size);
+    if (el.classList.contains('char-sprite')) {
+      el.replaceWith(canvas);
+    } else {
+      parent.insertBefore(canvas, parent.firstChild);
+    }
+  });
+}
+
+initSprites();
 initOpening();
 initMenu();
 initBattleControls();

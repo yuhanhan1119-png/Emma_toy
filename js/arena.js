@@ -11,7 +11,7 @@ const DRAIN_PER_SEC = 1.5;
 const HIT_DAMAGE = 20;
 const PROJECTILE_DAMAGE = 25;
 const PROJECTILE_INTERVAL = 2200;
-const PLAYER_SIZE = 80;
+const PLAYER_SIZE = 88;
 const FOOD_SIZE = 28;
 const FOOD_SPAWN_MIN = 3500;
 const FOOD_SPAWN_MAX = 7000;
@@ -578,7 +578,7 @@ export class ActionArena {
     ctx.fillStyle = '#5C3D5E';
     ctx.fillText(p.name, cx, y - 9 + bounce);
 
-    drawCharacter(ctx, p.charId, x, y + bounce, w, facing);
+    drawCharacter(ctx, x, y + bounce, w, p.charId, facing);
 
     if (p.jumping || !p.grounded) {
       ctx.font = 'bold 13px Nunito, sans-serif';

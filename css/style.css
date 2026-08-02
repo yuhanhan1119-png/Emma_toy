@@ -197,114 +197,38 @@ body {
   50% { box-shadow: 0 0 0 8px rgba(255,182,193,0); }
 }
 
-/* ===== Character Sprites (CSS Art) ===== */
-.char-sprite {
+/* ===== Character Sprites ===== */
+.char-sprite,
+.char-sprite-canvas {
   width: 80px;
   height: 80px;
-  border-radius: 50%;
+  border-radius: 20px;
   position: relative;
-  box-shadow: 0 4px 12px var(--shadow);
+  box-shadow: 0 6px 16px rgba(255, 140, 170, 0.25);
+  background: rgba(255, 255, 255, 0.5);
+  display: block;
 }
 
-/* Pompompurin - yellow dog with brown beret */
-.pompompurin {
-  background: radial-gradient(circle at 50% 45%, #F5D76E 60%, #E8C547 100%);
-}
-.pompompurin::before {
-  content: '🍮';
-  position: absolute;
-  font-size: 2.5rem;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-}
-.pompompurin::after {
-  content: '';
-  position: absolute;
-  top: -8px; left: 50%;
-  transform: translateX(-50%);
-  width: 40px; height: 16px;
-  background: #8B6914;
-  border-radius: 20px 20px 0 0;
+.char-sprite-canvas {
+  image-rendering: auto;
 }
 
-/* Cinnamoroll - white dog with big ears */
-.cinnamoroll {
-  background: radial-gradient(circle at 50% 55%, #FFFFFF 50%, #E8F4FC 100%);
-}
-.cinnamoroll::before {
-  content: '';
-  position: absolute;
-  top: -20px; left: -15px;
-  width: 30px; height: 50px;
-  background: #FFFFFF;
-  border-radius: 50%;
-  box-shadow: 55px 0 0 #FFFFFF;
-}
-.cinnamoroll::after {
-  content: '☁️';
-  position: absolute;
-  font-size: 2rem;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -40%);
+.char-card-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
 }
 
-/* Hello Kitty - white cat with red bow */
-.hellokitty {
-  background: radial-gradient(circle at 50% 50%, #FFFFFF 60%, #F0F0F0 100%);
-}
-.hellokitty::before {
-  content: '🎀';
-  position: absolute;
-  font-size: 1.8rem;
-  top: -5px; right: 5px;
-}
-.hellokitty::after {
-  content: '🐱';
-  position: absolute;
-  font-size: 2.2rem;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -45%);
+.menu-char .char-sprite-canvas,
+.menu-char .char-sprite {
+  width: 64px;
+  height: 64px;
 }
 
-/* Kuromi - purple/black with skull */
-.kuromi {
-  background: radial-gradient(circle at 50% 50%, #2C2C2C 50%, #1A1A1A 100%);
-  border: 3px solid var(--purple);
-}
-.kuromi::before {
-  content: '💀';
-  position: absolute;
-  font-size: 1.2rem;
-  top: -2px; left: 50%;
-  transform: translateX(-50%);
-}
-.kuromi::after {
-  content: '😈';
-  position: absolute;
-  font-size: 2rem;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -40%);
-}
-
-/* My Melody - pink rabbit with hood */
-.mymelody {
-  background: radial-gradient(circle at 50% 55%, #FFB6C1 50%, #FF9EC8 100%);
-}
-.mymelody::before {
-  content: '';
-  position: absolute;
-  top: -18px; left: 50%;
-  transform: translateX(-50%);
-  width: 60px; height: 35px;
-  background: #FFB6C1;
-  border-radius: 30px 30px 0 0;
-}
-.mymelody::after {
-  content: '🐰';
-  position: absolute;
-  font-size: 2rem;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -35%);
+.char-select-card .char-sprite-canvas {
+  width: 72px;
+  height: 72px;
 }
 
 /* ===== Main Menu ===== */
@@ -696,6 +620,36 @@ body {
   border: 2px solid rgba(155, 89, 182, 0.3);
 }
 
+.energy-label {
+  font-weight: 800;
+  color: var(--purple);
+  font-size: 0.9rem;
+}
+
+.energy-bar {
+  display: flex;
+  gap: 8px;
+}
+
+.energy-segment {
+  width: 40px;
+  height: 16px;
+  border-radius: 8px;
+  background: #E0E0E0;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.energy-segment.filled {
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  box-shadow: 0 0 8px rgba(255, 165, 0, 0.5);
+}
+
+.energy-hint {
+  font-size: 0.82rem;
+  opacity: 0.85;
+  text-align: center;
+}
+
 #arena-canvas {
   border-radius: 0;
   box-shadow: none;
@@ -719,6 +673,39 @@ body {
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
+}
+
+.btn-action {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.75rem 1.4rem;
+  border: none;
+  border-radius: 50px;
+  background: white;
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: 0 4px 12px var(--shadow);
+  transition: all 0.2s;
+  border: 2px solid rgba(255, 182, 193, 0.4);
+}
+
+.btn-action:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: var(--pink);
+  color: white;
+}
+
+.btn-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.battle-controls-hint {
+  font-size: 0.88rem;
+  opacity: 0.8;
+  text-align: center;
+  max-width: 900px;
 }
 
 #battle-screen .battle-result {
