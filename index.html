@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sanrio 大亂鬥 ✨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="game-container">
+    <!-- Opening Scene -->
+    <section id="opening-scene" class="screen active">
+      <div class="sky">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div class="sparkle s1">✦</div>
+        <div class="sparkle s2">✧</div>
+        <div class="sparkle s3">★</div>
+        <div class="sparkle s4">✦</div>
+      </div>
+      <div class="ground"></div>
+      <div class="opening-characters">
+        <div class="char-card" data-char="pompompurin">
+          <div class="char-sprite pompompurin"></div>
+          <span class="char-name">布丁狗</span>
+        </div>
+        <div class="char-card" data-char="cinnamoroll">
+          <div class="char-sprite cinnamoroll"></div>
+          <span class="char-name">大耳狗</span>
+        </div>
+        <div class="char-card" data-char="hellokitty">
+          <div class="char-sprite hellokitty"></div>
+          <span class="char-name">Hello Kitty</span>
+        </div>
+        <div class="char-card" data-char="kuromi">
+          <div class="char-sprite kuromi"></div>
+          <span class="char-name">酷洛米</span>
+        </div>
+        <div class="char-card" data-char="mymelody">
+          <div class="char-sprite mymelody"></div>
+          <span class="char-name">美樂蒂</span>
+        </div>
+      </div>
+      <div class="opening-title">
+        <h1>Sanrio 大亂鬥</h1>
+        <p class="subtitle">可愛夥伴們的冒險開始了！</p>
+      </div>
+      <button id="skip-opening" class="btn-skip">按 Enter 或點擊繼續 →</button>
+    </section>
+
+    <!-- Main Menu -->
+    <section id="main-menu" class="screen">
+      <div class="menu-bg"></div>
+      <h1 class="menu-title">Sanrio 大亂鬥</h1>
+      <div class="menu-buttons">
+        <button class="btn-menu" data-mode="1p">🎮 單人對戰（vs 電腦）</button>
+        <button class="btn-menu" data-mode="2p">👫 雙人對戰</button>
+      </div>
+      <p class="menu-hint">選擇遊戲模式開始吧！</p>
+    </section>
+
+    <!-- Character Select -->
+    <section id="char-select" class="screen">
+      <h2 id="select-title">選擇角色</h2>
+      <div id="select-panels">
+        <div class="select-panel" id="panel-p1">
+          <h3>玩家 1</h3>
+          <div class="char-grid" id="grid-p1"></div>
+        </div>
+        <div class="select-panel hidden" id="panel-p2">
+          <h3>玩家 2</h3>
+          <div class="char-grid" id="grid-p2"></div>
+        </div>
+        <div class="select-panel hidden" id="panel-cpu">
+          <h3>電腦對手</h3>
+          <div class="cpu-preview" id="cpu-preview"></div>
+        </div>
+      </div>
+      <button id="start-battle" class="btn-start" disabled>開始戰鬥！</button>
+      <button id="back-to-menu" class="btn-back">← 返回主選單</button>
+    </section>
+
+    <!-- Battle Screen -->
+    <section id="battle-screen" class="screen">
+      <div class="battle-arena">
+        <div class="fighter-area left" id="fighter-left">
+          <div class="fighter-info">
+            <span class="fighter-name" id="name-left"></span>
+            <div class="hp-bar"><div class="hp-fill" id="hp-left"></div></div>
+            <span class="hp-text" id="hp-text-left"></span>
+          </div>
+          <div class="fighter-sprite" id="sprite-left"></div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="fighter-area right" id="fighter-right">
+          <div class="fighter-info">
+            <span class="fighter-name" id="name-right"></span>
+            <div class="hp-bar"><div class="hp-fill" id="hp-right"></div></div>
+            <span class="hp-text" id="hp-text-right"></span>
+          </div>
+          <div class="fighter-sprite" id="sprite-right"></div>
+        </div>
+      </div>
+      <div class="battle-log" id="battle-log"></div>
+      <div class="battle-actions" id="battle-actions">
+        <button class="btn-action" data-action="attack">⚔️ 攻擊</button>
+        <button class="btn-action" data-action="special">✨ 必殺技</button>
+        <button class="btn-action" data-action="heal">💕 治療</button>
+      </div>
+      <div class="battle-controls-hint" id="controls-hint"></div>
+      <div class="battle-result hidden" id="battle-result">
+        <h2 id="winner-text"></h2>
+        <button id="rematch" class="btn-menu">再戰一局</button>
+        <button id="to-menu" class="btn-back">返回主選單</button>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
