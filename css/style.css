@@ -727,6 +727,48 @@ body {
   text-align: center;
 }
 
+.energy-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255,255,255,0.85);
+  padding: 0.8rem 1.5rem;
+  border-radius: 16px;
+  min-width: 280px;
+}
+.energy-label {
+  font-weight: 800;
+  color: var(--purple);
+  font-size: 0.9rem;
+}
+.energy-bar {
+  display: flex;
+  gap: 6px;
+}
+.energy-segment {
+  width: 36px;
+  height: 14px;
+  border-radius: 7px;
+  background: #E0E0E0;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.energy-segment.filled {
+  background: linear-gradient(90deg, #FFD700, #FFA500);
+  box-shadow: 0 0 8px rgba(255,165,0,0.5);
+}
+.energy-hint {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  text-align: center;
+}
+
+.btn-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .battle-result {
   position: absolute;
   inset: 0;

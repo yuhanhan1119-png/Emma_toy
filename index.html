@@ -139,10 +139,22 @@
         </div>
       </div>
       <div class="battle-log" id="battle-log"></div>
+      <div class="energy-panel hidden" id="energy-panel">
+        <span class="energy-label">能量</span>
+        <div class="energy-bar" id="energy-bar">
+          <div class="energy-segment"></div>
+          <div class="energy-segment"></div>
+          <div class="energy-segment"></div>
+          <div class="energy-segment"></div>
+          <div class="energy-segment"></div>
+        </div>
+        <span class="energy-hint" id="energy-hint">0/5 — 連續攻擊 5 次後按 W 使用大招</span>
+      </div>
       <div class="battle-actions" id="battle-actions">
-        <button class="btn-action" data-action="attack">⚔️ 攻擊</button>
+        <button class="btn-action" data-action="attack" id="btn-attack">⚔️ 攻擊</button>
         <button class="btn-action" data-action="special" id="btn-special">✨ 必殺技</button>
-        <button class="btn-action" data-action="heal">💕 治療</button>
+        <button class="btn-action" data-action="heal" id="btn-heal">💕 治療</button>
+        <button class="btn-action hidden" data-action="ultimate" id="btn-ultimate">🔥 大招 (W)</button>
       </div>
       <div class="battle-controls-hint" id="controls-hint"></div>
       <div class="battle-result hidden" id="battle-result">

@@ -32,15 +32,19 @@ npx serve .
 - 玩家 1：`A` 攻擊 | `S` 必殺技 | `D` 治療
 - 玩家 2：`J` 攻擊 | `K` 必殺技 | `L` 治療
 
-## 角色專屬攻擊
+## 單人模式戰鬥
 
-| 角色 | 攻擊招式 |
-|------|----------|
-| 布丁狗 | Shielding Big Poo-Poo |
-| 大耳狗 | Flying Fist |
-| Hello Kitty | Hello Kitty's Scream |
-| 酷洛米 | Dream Tree |
-| 美樂蒂 | Pee-Pee-Tree |
+- **普通攻擊**：低傷害（1 點），每次攻擊累積 1 格能量
+- **能量系統**：連續攻擊 5 次後能量滿格
+- **大招 (W)**：能量滿時按 `W` 鍵發動角色專屬大招
+
+| 角色 | 大招 | 傷害 |
+|------|------|------|
+| 布丁狗 | Pudingo's Shaking Body | 10（超強！） |
+| 大耳狗 | Flying Fist | 8 |
+| Hello Kitty | Hello Kitty's Scream | 8 |
+| 酷洛米 | Dream Tree | 8 |
+| 美樂蒂 | Pee-Pee-Tree | 8 |
 
 ## 遊戲流程
 

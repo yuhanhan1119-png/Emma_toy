@@ -151,26 +151,26 @@ function renderAttackPanel(player, charId, selectedAttack, onSelect) {
     <div class="char-sprite ${charId}"></div>
     <div class="attack-char-info">
       <span class="char-select-name">${char.name}</span>
-      <span class="char-select-stats">HP ${char.hp} | 攻擊力 ${char.special}</span>
+      <span class="char-select-stats">HP ${char.hp} | 大招威力 ${char.ultimateDamage}</span>
     </div>
   `;
 
   options.innerHTML = '';
   const card = document.createElement('button');
-  card.className = `attack-card${selectedAttack === char.specialName ? ' selected' : ''}`;
+  card.className = `attack-card${selectedAttack === char.ultimateName ? ' selected' : ''}`;
   card.innerHTML = `
-    <span class="attack-card-icon">✨</span>
-    <span class="attack-card-name">${char.specialName}</span>
+    <span class="attack-card-icon">🔥</span>
+    <span class="attack-card-name">${char.ultimateName}</span>
     <span class="attack-card-desc">${char.attackDesc}</span>
-    <span class="attack-card-power">威力：${char.special}</span>
+    <span class="attack-card-power">大招威力：${char.ultimateDamage}（連攻 5 次後按 W 發動）</span>
   `;
   if (onSelect) {
-    card.addEventListener('click', () => onSelect(char.specialName));
+    card.addEventListener('click', () => onSelect(char.ultimateName));
   }
   options.appendChild(card);
 
   if (!selectedAttack && onSelect) {
-    onSelect(char.specialName);
+    onSelect(char.ultimateName);
   }
 }
 
@@ -187,7 +187,7 @@ function pickCpuCharacter() {
 function startBattle() {
   if (gameMode === '1p') {
     pickCpuCharacter();
-    selectedAttackP2 = CHARACTERS[selectedP2].specialName;
+    selectedAttackP2 = CHARACTERS[selectedP2].ultimateName;
   }
 
   battle = new Battle(gameMode, selectedP1, selectedP2, selectedAttackP1, selectedAttackP2);
@@ -202,12 +202,7 @@ function startBattle() {
   document.getElementById('sprite-left').className = `fighter-sprite ${selectedP1}`;
   document.getElementById('sprite-right').className = `fighter-sprite ${selectedP2}`;
 
-  const hint = document.getElementById('controls-hint');
-  if (gameMode === '1p') {
-    hint.textContent = '你的回合：點擊下方按鈕行動';
-  } else {
-    hint.textContent = '玩家 1：A/S/D 攻擊/必殺/治療 | 玩家 2：J/K/L 攻擊/必殺/治療';
-  }
+  configureBattleUI();
 
   document.getElementById('battle-result').classList.add('hidden');
   document.getElementById('battle-actions').style.display = 'flex';
@@ -215,11 +210,10 @@ function startBattle() {
 
   if (gameMode === '1p') {
     const cpu = CHARACTERS[selectedP2];
-    battle.addLog(`🤖 電腦選擇了 ${cpu.name}，攻擊招式：${cpu.specialName}！`);
+    battle.addLog(`🤖 電腦選擇了 ${cpu.name}，大招：${cpu.ultimateName}！`);
     updateBattleUI();
   }
 
-  updateBattleActionLabels();
   showScreen('battle');
 
   if (gameMode === '1p' && battle.currentTurn === 'p2') {
@@ -227,7 +221,44 @@ function startBattle() {
   }
 }
 
+function configureBattleUI() {
+  const is1p = gameMode === '1p';
+  document.getElementById('energy-panel').classList.toggle('hidden', !is1p);
+  document.getElementById('btn-special').classList.toggle('hidden', is1p);
+  document.getElementById('btn-heal').classList.toggle('hidden', is1p);
+  document.getElementById('btn-ultimate').classList.toggle('hidden', !is1p);
+  document.getElementById('btn-attack').textContent = is1p ? '⚔️ 普通攻擊' : '⚔️ 攻擊';
+
+  const hint = document.getElementById('controls-hint');
+  if (is1p) {
+    const ultName = CHARACTERS[selectedP1].ultimateName;
+    hint.textContent = `普通攻擊累積能量，連攻 5 次後按 W 發動「${ultName}」`;
+  } else {
+    hint.textContent = '玩家 1：A/S/D 攻擊/必殺/治療 | 玩家 2：J/K/L 攻擊/必殺/治療';
+  }
+}
+
+function updateEnergyUI() {
+  if (gameMode !== '1p') return;
+
+  const energy = battle.p1.energy;
+  const segments = document.querySelectorAll('.energy-segment');
+  segments.forEach((seg, i) => {
+    seg.classList.toggle('filled', i < energy);
+  });
+
+  const ready = battle.canUseUltimate(battle.p1);
+  document.getElementById('energy-hint').textContent = ready
+    ? `能量已滿！按 W 或點擊大招按鈕發動「${battle.p1.ultimateName}」`
+    : `${energy}/5 — 再攻擊 ${5 - energy} 次可發動大招`;
+
+  const btnUlt = document.getElementById('btn-ultimate');
+  btnUlt.disabled = !ready || battle.currentTurn !== 'p1';
+  btnUlt.textContent = `🔥 ${battle.p1.ultimateName} (W)`;
+}
+
 function updateBattleActionLabels() {
+  if (gameMode === '1p') return;
   const current = battle.getCurrentFighter();
   document.getElementById('btn-special').textContent = `✨ ${current.chosenAttack}`;
 }
@@ -253,10 +284,14 @@ function updateBattleUI(result) {
   const actions = document.getElementById('battle-actions');
   if (battle.gameOver) {
     actions.style.display = 'none';
+    document.getElementById('energy-panel').classList.add('hidden');
   } else if (gameMode === '1p') {
     actions.style.display = battle.currentTurn === 'p1' ? 'flex' : 'none';
     document.getElementById('controls-hint').textContent =
-      battle.currentTurn === 'p1' ? '你的回合：點擊下方按鈕行動' : '🤖 電腦思考中...';
+      battle.currentTurn === 'p1'
+        ? `普通攻擊累積能量（${battle.p1.energy}/5），滿了按 W 發動大招`
+        : '🤖 電腦思考中...';
+    updateEnergyUI();
   } else {
     const turnLabel = battle.currentTurn === 'p1' ? '玩家 1' : '玩家 2';
     document.getElementById('controls-hint').textContent = `${turnLabel} 的回合！`;
@@ -270,7 +305,11 @@ function updateBattleUI(result) {
 function cpuTurn() {
   if (battle.gameOver || battle.currentTurn !== 'p2') return;
   const action = battle.cpuChooseAction();
-  battle.executeAction(action);
+  if (gameMode === '1p') {
+    battle.executeCpuAction(action);
+  } else {
+    battle.executeAction(action);
+  }
   if (!battle.gameOver && battle.currentTurn === 'p2') {
     setTimeout(cpuTurn, 800);
   }
@@ -287,7 +326,8 @@ function handleBattleAction(action) {
   if (battle.gameOver) return;
   if (gameMode === '1p' && battle.currentTurn !== 'p1') return;
 
-  battle.executeAction(action);
+  const result = battle.executeAction(action);
+  if (!result && action === 'ultimate') return;
 
   if (!battle.gameOver && gameMode === '1p' && battle.currentTurn === 'p2') {
     setTimeout(cpuTurn, 800);
@@ -308,6 +348,11 @@ function initBattleControls() {
     if (!screens.battle.classList.contains('active') || battle?.gameOver) return;
     const key = e.key.toLowerCase();
 
+    if (gameMode === '1p' && battle.currentTurn === 'p1') {
+      if (key === 'w') handleBattleAction('ultimate');
+      return;
+    }
+
     if (gameMode === '2p') {
       if (battle.currentTurn === 'p1' && keyMap.p1[key]) {
         handleBattleAction(keyMap.p1[key]);
@@ -324,7 +369,7 @@ function initBattleControls() {
   document.getElementById('rematch').addEventListener('click', () => {
     if (gameMode === '1p') {
       pickCpuCharacter();
-      selectedAttackP2 = CHARACTERS[selectedP2].specialName;
+      selectedAttackP2 = CHARACTERS[selectedP2].ultimateName;
     }
     startBattle();
   });

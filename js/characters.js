@@ -9,6 +9,9 @@ export const CHARACTERS = {
     heal: 20,
     specialName: 'Shielding Big Poo-Poo',
     attackDesc: '布丁狗用大便盾牌防禦並反擊！',
+    ultimateName: "Pudingo's Shaking Body",
+    ultimateDamage: 10,
+    basicDamage: 1,
     color: '#F5D76E',
     emoji: '🍮',
   },
@@ -22,6 +25,9 @@ export const CHARACTERS = {
     heal: 25,
     specialName: 'Flying Fist',
     attackDesc: '大耳狗揮出強力飛天拳！',
+    ultimateName: 'Flying Fist',
+    ultimateDamage: 8,
+    basicDamage: 1,
     color: '#A8D8EA',
     emoji: '☁️',
   },
@@ -35,6 +41,9 @@ export const CHARACTERS = {
     heal: 22,
     specialName: "Hello Kitty's Scream",
     attackDesc: 'Hello Kitty 發出震耳欲聾的尖叫！',
+    ultimateName: "Hello Kitty's Scream",
+    ultimateDamage: 8,
+    basicDamage: 1,
     color: '#FFB6C1',
     emoji: '🎀',
   },
@@ -48,6 +57,9 @@ export const CHARACTERS = {
     heal: 15,
     specialName: 'Dream Tree',
     attackDesc: '酷洛米召喚夢幻之樹攻擊敵人！',
+    ultimateName: 'Dream Tree',
+    ultimateDamage: 8,
+    basicDamage: 1,
     color: '#9B59B6',
     emoji: '💜',
   },
@@ -61,17 +73,23 @@ export const CHARACTERS = {
     heal: 30,
     specialName: 'Pee-Pee-Tree',
     attackDesc: '美樂蒂的 Pee-Pee-Tree 特殊攻擊！',
+    ultimateName: 'Pee-Pee-Tree',
+    ultimateDamage: 8,
+    basicDamage: 1,
     color: '#FF9EC8',
     emoji: '🌸',
   },
 };
 
+export const ENERGY_TO_ULTIMATE = 5;
+
 export function createFighter(charId, chosenAttack = null) {
   const base = CHARACTERS[charId];
   return {
     ...base,
-    chosenAttack: chosenAttack || base.specialName,
+    chosenAttack: chosenAttack || base.ultimateName,
     currentHp: base.hp,
+    energy: 0,
     specialUsed: false,
   };
 }
