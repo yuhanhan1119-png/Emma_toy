@@ -81,6 +81,7 @@ export const CHARACTERS = {
   },
 };
 
+export const BATTLE_MAX_HP = 500;
 export const ENERGY_TO_ULTIMATE = 5;
 
 export function createFighter(charId, chosenAttack = null) {
