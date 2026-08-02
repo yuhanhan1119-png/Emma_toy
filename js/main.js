@@ -26,11 +26,13 @@ function initOpening() {
   };
 
   document.getElementById('skip-opening').addEventListener('click', skip);
+  document.getElementById('watch-intro').addEventListener('click', () => {
+    showScreen('opening');
+    openingTimer = setTimeout(skip, 6000);
+  });
   document.addEventListener('keydown', (e) => {
     if (screens.opening.classList.contains('active') && e.key === 'Enter') skip();
   });
-
-  openingTimer = setTimeout(skip, 6000);
 }
 
 function initMenu() {
@@ -64,7 +66,9 @@ function showCharacterSelect() {
   const panelCpu = document.getElementById('panel-cpu');
   const startBtn = document.getElementById('start-battle');
 
-  title.textContent = gameMode === '1p' ? '單人對戰 — 選擇角色' : '雙人對戰 — 選擇角色';
+  title.textContent = gameMode === '1p' ? '單人對戰 — 選擇你的角色' : '雙人對戰 — 選擇角色';
+  document.getElementById('panel-p1-label').textContent =
+    gameMode === '1p' ? '選擇你的角色' : '玩家 1';
   panelP2.classList.toggle('hidden', gameMode === '1p');
   panelCpu.classList.toggle('hidden', gameMode === '2p');
   startBtn.disabled = true;
@@ -80,11 +84,6 @@ function showCharacterSelect() {
     Object.keys(CHARACTERS).forEach((id) => {
       gridP1.appendChild(renderCharCard(id, selectedP1, (cid) => {
         selectedP1 = cid;
-        if (gameMode === '1p') {
-          const cpuId = getRandomCharacter(cid);
-          selectedP2 = cpuId;
-          renderCpuPreview(cpuId);
-        }
         refresh();
         updateStartButton();
       }));
@@ -102,25 +101,21 @@ function showCharacterSelect() {
   showScreen('select');
 }
 
-function renderCpuPreview(charId) {
-  const char = CHARACTERS[charId];
-  const preview = document.getElementById('cpu-preview');
-  preview.innerHTML = `
-    <div class="char-sprite ${charId}"></div>
-    <div class="cpu-info">
-      <span class="char-select-name">${char.name}</span>
-      <span class="char-select-stats">HP ${char.hp} | ATK ${char.attack}</span>
-      <span class="cpu-label">🤖 電腦隨機選擇</span>
-    </div>
-  `;
-}
-
 function updateStartButton() {
   const ready = selectedP1 && (gameMode === '1p' || selectedP2);
   document.getElementById('start-battle').disabled = !ready;
 }
 
+function pickCpuCharacter() {
+  selectedP2 = getRandomCharacter(selectedP1);
+  return selectedP2;
+}
+
 function startBattle() {
+  if (gameMode === '1p') {
+    pickCpuCharacter();
+  }
+
   battle = new Battle(gameMode, selectedP1, selectedP2);
   battle.onUpdate = (result) => updateBattleUI(result);
   battle.onEnd = () => showBattleResult();
@@ -143,6 +138,13 @@ function startBattle() {
   document.getElementById('battle-result').classList.add('hidden');
   document.getElementById('battle-actions').style.display = 'flex';
   updateBattleUI();
+
+  if (gameMode === '1p') {
+    const cpu = CHARACTERS[selectedP2];
+    battle.addLog(`🤖 電腦選擇了 ${cpu.name}！`);
+    updateBattleUI();
+  }
+
   showScreen('battle');
 
   if (gameMode === '1p' && battle.currentTurn === 'p2') {
@@ -240,3 +242,4 @@ function initBattleControls() {
 initOpening();
 initMenu();
 initBattleControls();
+showScreen('menu');

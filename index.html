@@ -11,8 +11,8 @@
 </head>
 <body>
   <div id="game-container">
-    <!-- Opening Scene -->
-    <section id="opening-scene" class="screen active">
+    <!-- Opening Scene (optional, from main menu) -->
+    <section id="opening-scene" class="screen">
       <div class="sky">
         <div class="cloud cloud-1"></div>
         <div class="cloud cloud-2"></div>
@@ -52,15 +52,23 @@
       <button id="skip-opening" class="btn-skip">按 Enter 或點擊繼續 →</button>
     </section>
 
-    <!-- Main Menu -->
-    <section id="main-menu" class="screen">
+    <!-- Main Menu (start screen) -->
+    <section id="main-menu" class="screen active">
       <div class="menu-bg"></div>
+      <div class="menu-characters">
+        <div class="menu-char"><div class="char-sprite pompompurin"></div><span>布丁狗</span></div>
+        <div class="menu-char"><div class="char-sprite cinnamoroll"></div><span>大耳狗</span></div>
+        <div class="menu-char"><div class="char-sprite hellokitty"></div><span>Hello Kitty</span></div>
+        <div class="menu-char"><div class="char-sprite kuromi"></div><span>酷洛米</span></div>
+        <div class="menu-char"><div class="char-sprite mymelody"></div><span>美樂蒂</span></div>
+      </div>
       <h1 class="menu-title">Sanrio 大亂鬥</h1>
       <div class="menu-buttons">
         <button class="btn-menu" data-mode="1p">🎮 單人對戰（vs 電腦）</button>
         <button class="btn-menu" data-mode="2p">👫 雙人對戰</button>
       </div>
-      <p class="menu-hint">選擇遊戲模式開始吧！</p>
+      <p class="menu-hint">選擇模式 → 挑選角色 → 開始戰鬥！</p>
+      <button id="watch-intro" class="btn-back">✨ 觀看開場動畫</button>
     </section>
 
     <!-- Character Select -->
@@ -68,7 +76,7 @@
       <h2 id="select-title">選擇角色</h2>
       <div id="select-panels">
         <div class="select-panel" id="panel-p1">
-          <h3>玩家 1</h3>
+          <h3 id="panel-p1-label">選擇你的角色</h3>
           <div class="char-grid" id="grid-p1"></div>
         </div>
         <div class="select-panel hidden" id="panel-p2">
@@ -77,7 +85,13 @@
         </div>
         <div class="select-panel hidden" id="panel-cpu">
           <h3>電腦對手</h3>
-          <div class="cpu-preview" id="cpu-preview"></div>
+          <div class="cpu-preview" id="cpu-preview">
+            <div class="cpu-mystery">🤖</div>
+            <div class="cpu-info">
+              <span class="char-select-name">？？？</span>
+              <span class="cpu-label">開戰時電腦將隨機選擇角色</span>
+            </div>
+          </div>
         </div>
       </div>
       <button id="start-battle" class="btn-start" disabled>開始戰鬥！</button>
