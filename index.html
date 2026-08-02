@@ -67,7 +67,7 @@
         <button class="btn-menu" data-mode="1p">🎮 單人對戰（vs 電腦）</button>
         <button class="btn-menu" data-mode="2p">👫 雙人對戰</button>
       </div>
-      <p class="menu-hint">選擇模式 → 挑選角色 → 開始戰鬥！</p>
+      <p class="menu-hint">選擇模式 → 挑選角色 → 選擇攻擊 → 開始戰鬥！</p>
       <button id="watch-intro" class="btn-back">✨ 觀看開場動畫</button>
     </section>
 
@@ -94,8 +94,27 @@
           </div>
         </div>
       </div>
-      <button id="start-battle" class="btn-start" disabled>開始戰鬥！</button>
+      <button id="confirm-characters" class="btn-start" disabled>下一步：選擇攻擊 →</button>
       <button id="back-to-menu" class="btn-back">← 返回主選單</button>
+    </section>
+
+    <!-- Attack Select -->
+    <section id="attack-select" class="screen">
+      <h2 id="attack-title">選擇攻擊招式</h2>
+      <div id="attack-panels">
+        <div class="attack-panel" id="attack-panel-p1">
+          <h3 id="attack-p1-label">你的攻擊</h3>
+          <div class="attack-char-preview" id="attack-preview-p1"></div>
+          <div class="attack-options" id="attack-options-p1"></div>
+        </div>
+        <div class="attack-panel hidden" id="attack-panel-p2">
+          <h3>玩家 2 的攻擊</h3>
+          <div class="attack-char-preview" id="attack-preview-p2"></div>
+          <div class="attack-options" id="attack-options-p2"></div>
+        </div>
+      </div>
+      <button id="start-battle" class="btn-start" disabled>開始戰鬥！</button>
+      <button id="back-to-char-select" class="btn-back">← 返回選角</button>
     </section>
 
     <!-- Battle Screen -->
@@ -122,7 +141,7 @@
       <div class="battle-log" id="battle-log"></div>
       <div class="battle-actions" id="battle-actions">
         <button class="btn-action" data-action="attack">⚔️ 攻擊</button>
-        <button class="btn-action" data-action="special">✨ 必殺技</button>
+        <button class="btn-action" data-action="special" id="btn-special">✨ 必殺技</button>
         <button class="btn-action" data-action="heal">💕 治療</button>
       </div>
       <div class="battle-controls-hint" id="controls-hint"></div>

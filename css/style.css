@@ -507,6 +507,96 @@ body {
 
 .hidden { display: none !important; }
 
+/* ===== Attack Select ===== */
+#attack-select {
+  background: linear-gradient(160deg, #FFF0F5 0%, #E8D5F5 100%);
+  padding: 2rem;
+  gap: 1.5rem;
+}
+
+#attack-title {
+  font-size: 2rem;
+  color: #FF6B9D;
+}
+
+#attack-panels {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.attack-panel {
+  background: rgba(255,255,255,0.7);
+  border-radius: 20px;
+  padding: 1.5rem;
+  min-width: 300px;
+  max-width: 380px;
+  box-shadow: 0 4px 16px var(--shadow);
+}
+.attack-panel h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--purple);
+}
+
+.attack-char-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.8rem;
+  background: white;
+  border-radius: 16px;
+}
+.attack-char-preview .char-sprite { width: 64px; height: 64px; flex-shrink: 0; }
+.attack-char-info { display: flex; flex-direction: column; gap: 0.2rem; }
+
+.attack-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.attack-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 1rem 1.2rem;
+  border: 3px solid transparent;
+  border-radius: 16px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+}
+.attack-card:hover { border-color: var(--pink); transform: scale(1.02); }
+.attack-card.selected {
+  border-color: #FF6B9D;
+  background: #FFF0F5;
+  box-shadow: 0 0 0 3px rgba(255,107,157,0.2);
+}
+.attack-card-icon { font-size: 1.5rem; }
+.attack-card-name {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+.attack-card-desc {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+.attack-card-power {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--purple);
+  margin-top: 0.2rem;
+}
+
 /* ===== Battle Screen ===== */
 #battle-screen {
   background: linear-gradient(180deg, #87CEEB 0%, #C8F0D8 70%, #A8E6A0 100%);

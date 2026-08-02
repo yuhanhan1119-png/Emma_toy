@@ -5,12 +5,15 @@ const screens = {
   opening: document.getElementById('opening-scene'),
   menu: document.getElementById('main-menu'),
   select: document.getElementById('char-select'),
+  attack: document.getElementById('attack-select'),
   battle: document.getElementById('battle-screen'),
 };
 
 let gameMode = null;
 let selectedP1 = null;
 let selectedP2 = null;
+let selectedAttackP1 = null;
+let selectedAttackP2 = null;
 let battle = null;
 let openingTimer = null;
 
@@ -64,7 +67,7 @@ function showCharacterSelect() {
   const title = document.getElementById('select-title');
   const panelP2 = document.getElementById('panel-p2');
   const panelCpu = document.getElementById('panel-cpu');
-  const startBtn = document.getElementById('start-battle');
+  const startBtn = document.getElementById('confirm-characters');
 
   title.textContent = gameMode === '1p' ? '單人對戰 — 選擇你的角色' : '雙人對戰 — 選擇角色';
   document.getElementById('panel-p1-label').textContent =
@@ -103,6 +106,76 @@ function showCharacterSelect() {
 
 function updateStartButton() {
   const ready = selectedP1 && (gameMode === '1p' || selectedP2);
+  document.getElementById('confirm-characters').disabled = !ready;
+}
+
+function showAttackSelect() {
+  selectedAttackP1 = null;
+  selectedAttackP2 = null;
+
+  const title = document.getElementById('attack-title');
+  const panelP2 = document.getElementById('attack-panel-p2');
+  const startBtn = document.getElementById('start-battle');
+
+  title.textContent = gameMode === '1p' ? '選擇你的攻擊招式' : '選擇攻擊招式';
+  document.getElementById('attack-p1-label').textContent =
+    gameMode === '1p' ? '你的攻擊' : '玩家 1 的攻擊';
+  panelP2.classList.toggle('hidden', gameMode === '1p');
+  startBtn.disabled = true;
+
+  renderAttackPanel('p1', selectedP1, selectedAttackP1, (attack) => {
+    selectedAttackP1 = attack;
+    renderAttackPanel('p1', selectedP1, selectedAttackP1, null);
+    updateAttackStartButton();
+  });
+
+  if (gameMode === '2p') {
+    renderAttackPanel('p2', selectedP2, selectedAttackP2, (attack) => {
+      selectedAttackP2 = attack;
+      renderAttackPanel('p2', selectedP2, selectedAttackP2, null);
+      updateAttackStartButton();
+    });
+  }
+
+  showScreen('attack');
+}
+
+function renderAttackPanel(player, charId, selectedAttack, onSelect) {
+  if (!charId) return;
+
+  const char = CHARACTERS[charId];
+  const preview = document.getElementById(`attack-preview-${player}`);
+  const options = document.getElementById(`attack-options-${player}`);
+
+  preview.innerHTML = `
+    <div class="char-sprite ${charId}"></div>
+    <div class="attack-char-info">
+      <span class="char-select-name">${char.name}</span>
+      <span class="char-select-stats">HP ${char.hp} | 攻擊力 ${char.special}</span>
+    </div>
+  `;
+
+  options.innerHTML = '';
+  const card = document.createElement('button');
+  card.className = `attack-card${selectedAttack === char.specialName ? ' selected' : ''}`;
+  card.innerHTML = `
+    <span class="attack-card-icon">✨</span>
+    <span class="attack-card-name">${char.specialName}</span>
+    <span class="attack-card-desc">${char.attackDesc}</span>
+    <span class="attack-card-power">威力：${char.special}</span>
+  `;
+  if (onSelect) {
+    card.addEventListener('click', () => onSelect(char.specialName));
+  }
+  options.appendChild(card);
+
+  if (!selectedAttack && onSelect) {
+    onSelect(char.specialName);
+  }
+}
+
+function updateAttackStartButton() {
+  const ready = selectedAttackP1 && (gameMode === '1p' || selectedAttackP2);
   document.getElementById('start-battle').disabled = !ready;
 }
 
@@ -114,9 +187,10 @@ function pickCpuCharacter() {
 function startBattle() {
   if (gameMode === '1p') {
     pickCpuCharacter();
+    selectedAttackP2 = CHARACTERS[selectedP2].specialName;
   }
 
-  battle = new Battle(gameMode, selectedP1, selectedP2);
+  battle = new Battle(gameMode, selectedP1, selectedP2, selectedAttackP1, selectedAttackP2);
   battle.onUpdate = (result) => updateBattleUI(result);
   battle.onEnd = () => showBattleResult();
 
@@ -141,15 +215,21 @@ function startBattle() {
 
   if (gameMode === '1p') {
     const cpu = CHARACTERS[selectedP2];
-    battle.addLog(`🤖 電腦選擇了 ${cpu.name}！`);
+    battle.addLog(`🤖 電腦選擇了 ${cpu.name}，攻擊招式：${cpu.specialName}！`);
     updateBattleUI();
   }
 
+  updateBattleActionLabels();
   showScreen('battle');
 
   if (gameMode === '1p' && battle.currentTurn === 'p2') {
     setTimeout(cpuTurn, 800);
   }
+}
+
+function updateBattleActionLabels() {
+  const current = battle.getCurrentFighter();
+  document.getElementById('btn-special').textContent = `✨ ${current.chosenAttack}`;
 }
 
 function updateBattleUI(result) {
@@ -180,6 +260,10 @@ function updateBattleUI(result) {
   } else {
     const turnLabel = battle.currentTurn === 'p1' ? '玩家 1' : '玩家 2';
     document.getElementById('controls-hint').textContent = `${turnLabel} 的回合！`;
+  }
+
+  if (!battle.gameOver) {
+    updateBattleActionLabels();
   }
 }
 
@@ -233,9 +317,17 @@ function initBattleControls() {
     }
   });
 
+  document.getElementById('confirm-characters').addEventListener('click', showAttackSelect);
   document.getElementById('start-battle').addEventListener('click', startBattle);
   document.getElementById('back-to-menu').addEventListener('click', () => showScreen('menu'));
-  document.getElementById('rematch').addEventListener('click', startBattle);
+  document.getElementById('back-to-char-select').addEventListener('click', () => showScreen('select'));
+  document.getElementById('rematch').addEventListener('click', () => {
+    if (gameMode === '1p') {
+      pickCpuCharacter();
+      selectedAttackP2 = CHARACTERS[selectedP2].specialName;
+    }
+    startBattle();
+  });
   document.getElementById('to-menu').addEventListener('click', () => showScreen('menu'));
 }
 

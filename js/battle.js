@@ -1,10 +1,10 @@
 import { createFighter } from './characters.js';
 
 export class Battle {
-  constructor(mode, p1CharId, p2CharId) {
+  constructor(mode, p1CharId, p2CharId, p1Attack = null, p2Attack = null) {
     this.mode = mode;
-    this.p1 = createFighter(p1CharId);
-    this.p2 = createFighter(p2CharId);
+    this.p1 = createFighter(p1CharId, p1Attack);
+    this.p2 = createFighter(p2CharId, p2Attack);
     this.currentTurn = 'p1';
     this.gameOver = false;
     this.log = [];
@@ -51,7 +51,7 @@ export class Battle {
         target.currentHp = Math.max(0, target.currentHp - damage);
         actor.specialUsed = true;
         result.damage = damage;
-        this.addLog(`${actor.name} 使出「${actor.specialName}」！造成 ${damage} 點傷害！`);
+        this.addLog(`${actor.name} 使出「${actor.chosenAttack}」！造成 ${damage} 點傷害！`);
         break;
       }
       case 'heal': {

@@ -7,7 +7,8 @@ export const CHARACTERS = {
     attack: 18,
     special: 32,
     heal: 20,
-    specialName: '布丁衝撞',
+    specialName: 'Shielding Big Poo-Poo',
+    attackDesc: '布丁狗用大便盾牌防禦並反擊！',
     color: '#F5D76E',
     emoji: '🍮',
   },
@@ -19,7 +20,8 @@ export const CHARACTERS = {
     attack: 16,
     special: 28,
     heal: 25,
-    specialName: '雲朵飛踢',
+    specialName: 'Flying Fist',
+    attackDesc: '大耳狗揮出強力飛天拳！',
     color: '#A8D8EA',
     emoji: '☁️',
   },
@@ -31,7 +33,8 @@ export const CHARACTERS = {
     attack: 17,
     special: 30,
     heal: 22,
-    specialName: '蝴蝶結旋風',
+    specialName: "Hello Kitty's Scream",
+    attackDesc: 'Hello Kitty 發出震耳欲聾的尖叫！',
     color: '#FFB6C1',
     emoji: '🎀',
   },
@@ -43,7 +46,8 @@ export const CHARACTERS = {
     attack: 22,
     special: 38,
     heal: 15,
-    specialName: '暗黑閃電',
+    specialName: 'Dream Tree',
+    attackDesc: '酷洛米召喚夢幻之樹攻擊敵人！',
     color: '#9B59B6',
     emoji: '💜',
   },
@@ -55,16 +59,18 @@ export const CHARACTERS = {
     attack: 15,
     special: 26,
     heal: 30,
-    specialName: '治癒之歌',
+    specialName: 'Pee-Pee-Tree',
+    attackDesc: '美樂蒂的 Pee-Pee-Tree 特殊攻擊！',
     color: '#FF9EC8',
     emoji: '🌸',
   },
 };
 
-export function createFighter(charId) {
+export function createFighter(charId, chosenAttack = null) {
   const base = CHARACTERS[charId];
   return {
     ...base,
+    chosenAttack: chosenAttack || base.specialName,
     currentHp: base.hp,
     specialUsed: false,
   };
