@@ -1,4 +1,4 @@
-import { CHARACTERS, BATTLE_MAX_HP } from './characters.js';
+import { CHARACTERS, BATTLE_MAX_HP, ENERGY_TO_ULTIMATE } from './characters.js';
 
 const ARENA_W = 900;
 const ARENA_H = 520;
@@ -65,6 +65,7 @@ function createPlayer(charId, x, isCpu = false) {
     moveDir: 0,
     basicShootCd: 0,
     strongShootCd: 0,
+    energy: 0,
   };
 }
 
@@ -137,15 +138,37 @@ export class ActionArena {
   playerShoot(shooter, target, type) {
     const now = performance.now();
     const isStrong = type === 'strong';
-    const cdKey = isStrong ? 'strongShootCd' : 'basicShootCd';
-    const cooldown = isStrong ? 600 : 350;
-    if (now < shooter[cdKey]) return;
-    shooter[cdKey] = now + cooldown;
+
+    if (isStrong) {
+      if (shooter.energy < ENERGY_TO_ULTIMATE) {
+        this.skillTexts.push({
+          x: shooter.x + shooter.w / 2,
+          y: shooter.y - 30,
+          text: `能量不足！再攻擊 ${ENERGY_TO_ULTIMATE - shooter.energy} 次可發大絕`,
+          until: now + 900,
+        });
+        return false;
+      }
+      if (now < shooter.strongShootCd) return false;
+      shooter.strongShootCd = now + 800;
+    } else {
+      if (now < shooter.basicShootCd) return false;
+      shooter.basicShootCd = now + 350;
+    }
+
     this.spawnSkillProjectile(shooter, target, type, now);
+    return true;
   }
 
   spawnSkillProjectile(shooter, target, type, now = performance.now()) {
     const isStrong = type === 'strong';
+
+    if (isStrong) {
+      shooter.energy = 0;
+    } else {
+      shooter.energy = Math.min(ENERGY_TO_ULTIMATE, shooter.energy + 1);
+    }
+
     const skillName = isStrong ? shooter.strongSkill : shooter.basicSkill;
     const sx = shooter.x + shooter.w / 2;
     const sy = shooter.y + shooter.h / 2;
@@ -373,9 +396,28 @@ export class ActionArena {
     shooter.shootTimer -= dt * 1000;
     if (shooter.shootTimer <= 0) {
       shooter.shootTimer = PROJECTILE_INTERVAL + Math.random() * 800;
-      const type = Math.random() < 0.35 ? 'strong' : 'basic';
-      this.spawnSkillProjectile(shooter, target, type);
+      const type = shooter.energy >= ENERGY_TO_ULTIMATE ? 'strong' : 'basic';
+      const now = performance.now();
+      if (type === 'strong' && now < shooter.strongShootCd) {
+        this.spawnSkillProjectile(shooter, target, 'basic', now);
+      } else if (type === 'basic' && now < shooter.basicShootCd) {
+        return;
+      } else if (type === 'strong') {
+        shooter.strongShootCd = now + 800;
+        this.spawnSkillProjectile(shooter, target, 'strong', now);
+      } else {
+        shooter.basicShootCd = now + 350;
+        this.spawnSkillProjectile(shooter, target, 'basic', now);
+      }
     }
+  }
+
+  canUseUltimate(player) {
+    return player.energy >= ENERGY_TO_ULTIMATE;
+  }
+
+  getEnergy(player) {
+    return player.energy;
   }
 
   updateProjectiles(dt, now) {

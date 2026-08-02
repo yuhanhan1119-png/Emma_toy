@@ -113,12 +113,23 @@
           <span class="hp-text" id="hp-text-right">500/500</span>
         </div>
       </div>
+      <div class="energy-panel" id="energy-panel">
+        <span class="energy-label">大絕能量</span>
+        <div class="energy-bar" id="energy-bar">
+          <div class="energy-segment"></div>
+          <div class="energy-segment"></div>
+          <div class="energy-segment"></div>
+          <div class="energy-segment"></div>
+          <div class="energy-segment"></div>
+        </div>
+        <span class="energy-hint" id="energy-hint">0/5 — 連續攻擊 5 次後按 W 發動大絕</span>
+      </div>
       <canvas id="arena-canvas"></canvas>
       <div class="arena-controls">
         <p class="battle-controls-hint" id="controls-hint"></p>
         <div class="arena-controls-buttons">
         <button id="btn-shoot-d" class="btn-action">⚔️ 攻擊 (D)</button>
-        <button id="btn-shoot-w" class="btn-action">🔥 強攻 (W)</button>
+        <button id="btn-shoot-w" class="btn-action" disabled>🔥 大絕 (W)</button>
         <button id="btn-jump" class="btn-action">⬆️ 跳躍 (Space)</button>
         </div>
       </div>

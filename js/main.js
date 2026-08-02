@@ -1,4 +1,4 @@
-import { CHARACTERS, BATTLE_MAX_HP, getRandomCharacter } from './characters.js';
+import { CHARACTERS, BATTLE_MAX_HP, ENERGY_TO_ULTIMATE, getRandomCharacter } from './characters.js';
 import { ActionArena } from './arena.js';
 
 const screens = {
@@ -120,6 +120,18 @@ function updateHud() {
   document.getElementById('hp-right').style.width = `${arena.getHpPercent(p2)}%`;
   document.getElementById('hp-text-left').textContent = `${Math.ceil(p1.hp)}/${BATTLE_MAX_HP}`;
   document.getElementById('hp-text-right').textContent = `${Math.ceil(p2.hp)}/${BATTLE_MAX_HP}`;
+
+  const energy = arena.getEnergy(p1);
+  document.querySelectorAll('.energy-segment').forEach((seg, i) => {
+    seg.classList.toggle('filled', i < energy);
+  });
+
+  const btnUlt = document.getElementById('btn-shoot-w');
+  const ready = arena.canUseUltimate(p1);
+  btnUlt.disabled = !ready;
+  document.getElementById('energy-hint').textContent = ready
+    ? `能量已滿！按 W 發動大絕「${p1.ultimateName}」`
+    : `能量 ${energy}/${ENERGY_TO_ULTIMATE} — 再攻擊 ${ENERGY_TO_ULTIMATE - energy} 次可發大絕`;
 }
 
 function showBattleResult(winner, p1, p2) {
@@ -147,14 +159,14 @@ function startBattle() {
   document.getElementById('name-left').textContent = p1.name;
   document.getElementById('name-right').textContent = p2.name;
   document.getElementById('btn-shoot-d').textContent = `⚔️ ${p1.specialName} (D)`;
-  document.getElementById('btn-shoot-w').textContent = `🔥 ${p1.ultimateName} (W)`;
+  document.getElementById('btn-shoot-w').textContent = `🔥 大絕：${p1.ultimateName} (W)`;
   document.getElementById('battle-result').classList.add('hidden');
 
   const hint = document.getElementById('controls-hint');
   if (gameMode === '1p') {
-    hint.textContent = `↑↓←→ 移動 | D「${p1.specialName}」| W「${p1.ultimateName}」| Space 跳躍`;
+    hint.textContent = `↑↓←→ 移動 | D 攻擊累積能量 | 連攻5次後 W 發大絕 | Space 跳躍`;
   } else {
-    hint.textContent = '玩家1：方向鍵移動 D攻擊 W強攻 Space跳躍 | 玩家2：WASD移動 J攻擊 K強攻 Shift跳躍';
+    hint.textContent = '玩家1：方向鍵 D攻擊(累能量) W大絕(需5次) | 玩家2：WASD J攻擊 K大絕 Shift跳躍';
   }
 
   if (arena) arena.stop();
