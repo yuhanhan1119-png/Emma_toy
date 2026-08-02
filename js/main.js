@@ -146,11 +146,13 @@ function startBattle() {
 
   document.getElementById('name-left').textContent = p1.name;
   document.getElementById('name-right').textContent = p2.name;
+  document.getElementById('btn-shoot-d').textContent = `⚔️ ${p1.specialName} (D)`;
+  document.getElementById('btn-shoot-w').textContent = `🔥 ${p1.ultimateName} (W)`;
   document.getElementById('battle-result').classList.add('hidden');
 
   const hint = document.getElementById('controls-hint');
   if (gameMode === '1p') {
-    hint.textContent = '↑↓←→ 移動 | D 攻擊 | W 強攻 | Space 跳躍 | 吃食物回血！';
+    hint.textContent = `↑↓←→ 移動 | D「${p1.specialName}」| W「${p1.ultimateName}」| Space 跳躍`;
   } else {
     hint.textContent = '玩家1：方向鍵移動 D攻擊 W強攻 Space跳躍 | 玩家2：WASD移動 J攻擊 K強攻 Shift跳躍';
   }

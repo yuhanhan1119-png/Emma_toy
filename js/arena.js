@@ -46,6 +46,8 @@ function createPlayer(charId, x, isCpu = false) {
     color: char.color,
     emoji: char.emoji,
     ultimateName: char.ultimateName,
+    basicSkill: char.specialName,
+    strongSkill: char.ultimateName,
     x,
     y: GROUND_Y - PLAYER_SIZE,
     vx: 0,
@@ -78,6 +80,7 @@ export class ActionArena {
     this.projectiles = [];
     this.foods = [];
     this.pickupTexts = [];
+    this.skillTexts = [];
     this.foodSpawnTimer = 2000;
     this.keys = {};
     this.gameOver = false;
@@ -138,24 +141,39 @@ export class ActionArena {
     const cooldown = isStrong ? 600 : 350;
     if (now < shooter[cdKey]) return;
     shooter[cdKey] = now + cooldown;
+    this.spawnSkillProjectile(shooter, target, type, now);
+  }
 
+  spawnSkillProjectile(shooter, target, type, now = performance.now()) {
+    const isStrong = type === 'strong';
+    const skillName = isStrong ? shooter.strongSkill : shooter.basicSkill;
     const sx = shooter.x + shooter.w / 2;
     const sy = shooter.y + shooter.h / 2;
     const tx = target.x + target.w / 2;
     const ty = target.y + target.h / 2;
     const angle = Math.atan2(ty - sy, tx - sx);
     const speed = isStrong ? 9 : 7;
-    const damage = isStrong ? 35 : 22;
+    const damage = isStrong ? shooter.strongSkill === "Pudingo's Shaking Body" ? 40 : 35 : 22;
 
     this.projectiles.push({
       x: sx,
       y: sy,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
-      r: isStrong ? 14 : 10,
+      r: isStrong ? 18 : 14,
       owner: shooter,
       damage,
       isStrong,
+      skillName,
+      skillEmoji: shooter.emoji,
+      skillColor: shooter.color,
+    });
+
+    this.skillTexts.push({
+      x: sx,
+      y: sy - 30,
+      text: `${shooter.name} 使出「${skillName}」！`,
+      until: now + 1000,
     });
   }
 
@@ -212,7 +230,7 @@ export class ActionArena {
     this.updateFoods(dt, now);
     this.updateProjectiles(dt, now);
     this.cpuShoot(this.p2, this.p1, dt);
-    if (this.mode === '2p') this.cpuShoot(this.p1, this.p2, dt, true);
+    if (this.mode === '2p') this.cpuShoot(this.p1, this.p2, dt);
 
     if (this.p1.hp <= 0 || this.p2.hp <= 0) {
       this.endGame();
@@ -311,6 +329,7 @@ export class ActionArena {
     });
 
     this.pickupTexts = this.pickupTexts.filter((t) => now < t.until);
+    this.skillTexts = this.skillTexts.filter((t) => now < t.until);
   }
 
   playerHitsFood(player, food) {
@@ -349,21 +368,13 @@ export class ActionArena {
     });
   }
 
-  cpuShoot(shooter, target, dt, manual = false) {
+  cpuShoot(shooter, target, dt) {
     if (shooter.hp <= 0 || target.hp <= 0) return;
     shooter.shootTimer -= dt * 1000;
     if (shooter.shootTimer <= 0) {
       shooter.shootTimer = PROJECTILE_INTERVAL + Math.random() * 800;
-      const dir = target.x > shooter.x ? 1 : -1;
-      this.projectiles.push({
-        x: shooter.x + shooter.w / 2,
-        y: shooter.y + shooter.h * 0.6,
-        vx: dir * 6,
-        vy: 0,
-        r: 12,
-        owner: shooter,
-        damage: PROJECTILE_DAMAGE,
-      });
+      const type = Math.random() < 0.35 ? 'strong' : 'basic';
+      this.spawnSkillProjectile(shooter, target, type);
     }
   }
 
@@ -419,15 +430,27 @@ export class ActionArena {
     ctx.fillRect(0, GROUND_Y, ARENA_W, 8);
 
     this.projectiles.forEach((pr) => {
+      const r = pr.r;
+      ctx.fillStyle = pr.skillColor || (pr.owner === this.p1 ? '#FF6B9D' : '#9B59B6');
       ctx.beginPath();
-      ctx.arc(pr.x, pr.y, pr.r, 0, Math.PI * 2);
-      ctx.fillStyle = pr.isStrong
-        ? (pr.owner === this.p1 ? '#FF3366' : '#7B2D8E')
-        : (pr.owner === this.p1 ? '#FF6B9D' : '#9B59B6');
+      ctx.arc(pr.x, pr.y, r, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = pr.isStrong ? '#FFD700' : 'white';
       ctx.lineWidth = pr.isStrong ? 3 : 2;
       ctx.stroke();
+
+      ctx.font = `${r}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(pr.skillEmoji || '✨', pr.x, pr.y);
+
+      ctx.font = `bold ${pr.isStrong ? 11 : 10}px Nunito, sans-serif`;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.strokeStyle = '#5C3D5E';
+      ctx.lineWidth = 3;
+      const label = pr.skillName || '攻擊';
+      ctx.strokeText(label, pr.x, pr.y - r - 10);
+      ctx.fillText(label, pr.x, pr.y - r - 10);
     });
 
     const now = performance.now();
@@ -461,6 +484,16 @@ export class ActionArena {
       ctx.fillStyle = '#2ECC71';
       ctx.textAlign = 'center';
       ctx.fillText(`${t.text} ${t.label}`, t.x, t.y - 20 * (1 - alpha));
+      ctx.globalAlpha = 1;
+    });
+
+    this.skillTexts.forEach((t) => {
+      const alpha = Math.min(1, (t.until - now) / 1000);
+      ctx.globalAlpha = alpha;
+      ctx.font = 'bold 14px Nunito, sans-serif';
+      ctx.fillStyle = '#FF6B9D';
+      ctx.textAlign = 'center';
+      ctx.fillText(t.text, t.x, t.y - 15 * (1 - alpha));
       ctx.globalAlpha = 1;
     });
 
