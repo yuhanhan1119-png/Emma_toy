@@ -1,4 +1,5 @@
 import { CHARACTERS, BATTLE_MAX_HP, ENERGY_TO_ULTIMATE } from './characters.js';
+import { drawCharacter } from './sprites.js';
 
 const ARENA_W = 900;
 const ARENA_H = 520;
@@ -10,7 +11,7 @@ const DRAIN_PER_SEC = 1.5;
 const HIT_DAMAGE = 20;
 const PROJECTILE_DAMAGE = 25;
 const PROJECTILE_INTERVAL = 2200;
-const PLAYER_SIZE = 56;
+const PLAYER_SIZE = 80;
 const FOOD_SIZE = 28;
 const FOOD_SPAWN_MIN = 3500;
 const FOOD_SPAWN_MAX = 7000;
@@ -176,7 +177,7 @@ export class ActionArena {
     const ty = target.y + target.h / 2;
     const angle = Math.atan2(ty - sy, tx - sx);
     const speed = isStrong ? 9 : 7;
-    const damage = isStrong ? shooter.strongSkill === "Pudingo's Shaking Body" ? 40 : 35 : 22;
+    const damage = isStrong ? 5 : 1;
 
     this.projectiles.push({
       x: sx,
@@ -469,7 +470,20 @@ export class ActionArena {
     ctx.fillStyle = '#7BC96F';
     ctx.fillRect(0, GROUND_Y, ARENA_W, ARENA_H - GROUND_Y);
     ctx.fillStyle = '#8FD480';
-    ctx.fillRect(0, GROUND_Y, ARENA_W, 8);
+    ctx.fillRect(0, GROUND_Y, ARENA_W, 10);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    for (let i = 0; i < 8; i++) {
+      const gx = (i + 0.5) * (ARENA_W / 8);
+      ctx.beginPath();
+      ctx.ellipse(gx, GROUND_Y + 18, 30, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = 'bold 20px Nunito, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('萌萌可愛大亂鬥', ARENA_W / 2, 36);
 
     this.projectiles.forEach((pr) => {
       const r = pr.r;
@@ -539,37 +553,40 @@ export class ActionArena {
       ctx.globalAlpha = 1;
     });
 
-    this.drawPlayer(this.p1);
-    this.drawPlayer(this.p2);
+    this.drawPlayer(this.p1, this.p2);
+    this.drawPlayer(this.p2, this.p1);
   }
 
-  drawPlayer(p) {
+  drawPlayer(p, opponent) {
     if (p.hp <= 0) return;
     const ctx = this.ctx;
     const { x, y, w, h } = p;
+    const cx = x + w / 2;
+    const facing = opponent.x > p.x ? 1 : -1;
+    const bounce = p.jumping ? -4 : Math.sin(performance.now() / 200 + x) * 2;
 
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
     ctx.beginPath();
-    ctx.ellipse(x + w / 2, GROUND_Y + 4, w * 0.4, 8, 0, 0, Math.PI * 2);
+    ctx.ellipse(cx, GROUND_Y + 6, w * 0.42, 10, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.arc(x + w / 2, y + h / 2, w / 2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    ctx.font = '28px serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.font = 'bold 11px Nunito, sans-serif';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(p.emoji, x + w / 2, y + h / 2);
+    const tagW = ctx.measureText(p.name).width + 16;
+    ctx.fillRect(cx - tagW / 2, y - 22 + bounce, tagW, 18);
+    ctx.fillStyle = '#5C3D5E';
+    ctx.fillText(p.name, cx, y - 9 + bounce);
+
+    drawCharacter(ctx, p.charId, x, y + bounce, w, facing);
 
     if (p.jumping || !p.grounded) {
-      ctx.font = 'bold 12px Nunito, sans-serif';
+      ctx.font = 'bold 13px Nunito, sans-serif';
       ctx.fillStyle = '#FF6B9D';
-      ctx.fillText('閃避!', x + w / 2, y - 10);
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 3;
+      ctx.strokeText('閃避!', cx, y - 28 + bounce);
+      ctx.fillText('閃避!', cx, y - 28 + bounce);
     }
   }
 
