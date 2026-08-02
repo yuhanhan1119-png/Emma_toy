@@ -11,6 +11,32 @@ const HIT_DAMAGE = 20;
 const PROJECTILE_DAMAGE = 25;
 const PROJECTILE_INTERVAL = 2200;
 const PLAYER_SIZE = 56;
+const FOOD_SIZE = 28;
+const FOOD_SPAWN_MIN = 3500;
+const FOOD_SPAWN_MAX = 7000;
+const MAX_FOOD_ON_FIELD = 4;
+const FOOD_LIFETIME = 12000;
+
+const FOOD_TYPES = [
+  { emoji: '🍫', name: '巧克力', heal: 5, weight: 1 },
+  { emoji: '🍗', name: '雞腿', heal: 3, weight: 2 },
+  { emoji: '🍓', name: '草莓', heal: 2, weight: 3 },
+  { emoji: '🍎', name: '蘋果', heal: 1, weight: 4 },
+  { emoji: '🍊', name: '橘子', heal: 1, weight: 4 },
+  { emoji: '🍇', name: '葡萄', heal: 1, weight: 4 },
+  { emoji: '🍌', name: '香蕉', heal: 1, weight: 4 },
+  { emoji: '🍉', name: '西瓜', heal: 1, weight: 4 },
+];
+
+function pickRandomFood() {
+  const total = FOOD_TYPES.reduce((sum, f) => sum + f.weight, 0);
+  let roll = Math.random() * total;
+  for (const food of FOOD_TYPES) {
+    roll -= food.weight;
+    if (roll <= 0) return food;
+  }
+  return FOOD_TYPES[FOOD_TYPES.length - 1];
+}
 
 function createPlayer(charId, x, isCpu = false) {
   const char = CHARACTERS[charId];
@@ -48,6 +74,9 @@ export class ActionArena {
     this.frameId = null;
     this.lastTime = 0;
     this.projectiles = [];
+    this.foods = [];
+    this.pickupTexts = [];
+    this.foodSpawnTimer = 2000;
     this.keys = {};
     this.gameOver = false;
 
@@ -135,6 +164,7 @@ export class ActionArena {
     this.clampPlayer(this.p2);
 
     this.drainHp(dt);
+    this.updateFoods(dt, now);
     this.updateProjectiles(dt, now);
     this.cpuShoot(this.p2, this.p1, dt);
     if (this.mode === '2p') this.cpuShoot(this.p1, this.p2, dt, true);
@@ -172,6 +202,79 @@ export class ActionArena {
 
     const dist = target.x - cpu.x;
     if (Math.abs(dist) > 40) cpu.x += Math.sign(dist) * MOVE_SPEED * 0.5;
+
+    const nearestFood = this.getNearestFood(cpu);
+    if (nearestFood && cpu.hp < cpu.maxHp * 0.9 && Math.random() < 0.03) {
+      const fx = nearestFood.x + nearestFood.size / 2;
+      const cx = cpu.x + cpu.w / 2;
+      cpu.x += Math.sign(fx - cx) * MOVE_SPEED * 0.7;
+    }
+  }
+
+  getNearestFood(player) {
+    if (this.foods.length === 0) return null;
+    const cx = player.x + player.w / 2;
+    const cy = player.y + player.h / 2;
+    return this.foods.reduce((best, food) => {
+      const fx = food.x + food.size / 2;
+      const fy = food.y + food.size / 2;
+      const dist = Math.hypot(fx - cx, fy - cy);
+      if (!best || dist < best.dist) return { food, dist };
+      return best;
+    }, null)?.food ?? null;
+  }
+
+  spawnFood(now) {
+    if (this.foods.length >= MAX_FOOD_ON_FIELD) return;
+    const type = pickRandomFood();
+    const size = FOOD_SIZE;
+    const x = 40 + Math.random() * (ARENA_W - 80 - size);
+    const y = GROUND_Y - size - 4;
+    this.foods.push({
+      ...type,
+      x,
+      y,
+      size,
+      spawnAt: now,
+      bob: Math.random() * Math.PI * 2,
+    });
+  }
+
+  updateFoods(dt, now) {
+    this.foodSpawnTimer -= dt * 1000;
+    if (this.foodSpawnTimer <= 0) {
+      this.spawnFood(now);
+      this.foodSpawnTimer = FOOD_SPAWN_MIN + Math.random() * (FOOD_SPAWN_MAX - FOOD_SPAWN_MIN);
+    }
+
+    this.foods = this.foods.filter((food) => now - food.spawnAt < FOOD_LIFETIME);
+
+    [this.p1, this.p2].forEach((player) => {
+      if (player.hp <= 0) return;
+      this.foods = this.foods.filter((food) => {
+        if (!this.playerHitsFood(player, food)) return true;
+        const healed = Math.min(food.heal, player.maxHp - player.hp);
+        player.hp = Math.min(player.maxHp, player.hp + food.heal);
+        this.pickupTexts.push({
+          x: food.x + food.size / 2,
+          y: food.y,
+          text: `+${food.heal}`,
+          label: food.name,
+          until: now + 900,
+        });
+        return false;
+      });
+    });
+
+    this.pickupTexts = this.pickupTexts.filter((t) => now < t.until);
+  }
+
+  playerHitsFood(player, food) {
+    const cx = player.x + player.w / 2;
+    const cy = player.y + player.h / 2;
+    const fx = food.x + food.size / 2;
+    const fy = food.y + food.size / 2;
+    return Math.hypot(cx - fx, cy - fy) < player.w * 0.45 + food.size * 0.45;
   }
 
   willHitPlayer(pr, player) {
@@ -279,6 +382,40 @@ export class ActionArena {
       ctx.strokeStyle = 'white';
       ctx.lineWidth = 2;
       ctx.stroke();
+    });
+
+    const now = performance.now();
+    this.foods.forEach((food) => {
+      const bobY = Math.sin(now / 300 + food.bob) * 3;
+      const cx = food.x + food.size / 2;
+      const cy = food.y + food.size / 2 + bobY;
+      const lifeRatio = 1 - (now - food.spawnAt) / FOOD_LIFETIME;
+      ctx.globalAlpha = lifeRatio < 0.2 ? lifeRatio * 5 : 1;
+
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.beginPath();
+      ctx.arc(cx, cy, food.size / 2 + 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.font = `${food.size}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(food.emoji, cx, cy);
+
+      ctx.font = 'bold 10px Nunito, sans-serif';
+      ctx.fillStyle = '#5C3D5E';
+      ctx.fillText(`+${food.heal}`, cx, cy + food.size / 2 + 8);
+      ctx.globalAlpha = 1;
+    });
+
+    this.pickupTexts.forEach((t) => {
+      const alpha = (t.until - now) / 900;
+      ctx.globalAlpha = alpha;
+      ctx.font = 'bold 16px Nunito, sans-serif';
+      ctx.fillStyle = '#2ECC71';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${t.text} ${t.label}`, t.x, t.y - 20 * (1 - alpha));
+      ctx.globalAlpha = 1;
     });
 
     this.drawPlayer(this.p1);

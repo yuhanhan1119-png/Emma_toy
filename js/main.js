@@ -150,7 +150,7 @@ function startBattle() {
 
   const hint = document.getElementById('controls-hint');
   if (gameMode === '1p') {
-    hint.textContent = '↑↓←→ 移動角色 | Space / 跳躍按鈕 閃避攻擊 | 生命會慢慢減少！';
+    hint.textContent = '↑↓←→ 移動 | Space 跳躍閃避 | 吃食物回血！🍫+5 🍗+3 🍓+2 🍎+1';
   } else {
     hint.textContent = '玩家1：方向鍵移動 + Space跳躍 | 玩家2：WASD移動 + Shift跳躍';
   }
