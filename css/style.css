@@ -655,6 +655,17 @@ body {
   gap: 0.6rem;
 }
 
+.arena-controls .btn-action {
+  margin: 0 0.3rem;
+}
+
+.arena-controls-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 #battle-screen .battle-result {
   position: absolute;
   inset: 0;

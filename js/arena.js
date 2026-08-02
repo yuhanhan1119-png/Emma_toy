@@ -61,6 +61,8 @@ function createPlayer(charId, x, isCpu = false) {
     shootTimer: PROJECTILE_INTERVAL * Math.random(),
     moveTimer: 0,
     moveDir: 0,
+    basicShootCd: 0,
+    strongShootCd: 0,
   };
 }
 
@@ -91,10 +93,18 @@ export class ActionArena {
     this.onKeyDown = (e) => {
       if (!this.running) return;
       this.keys[e.key] = true;
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+      const key = e.key.toLowerCase();
+      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key) || e.key.startsWith('Arrow')) {
         e.preventDefault();
       }
       if (e.key === ' ' || e.key === 'Spacebar') this.tryJump(this.p1);
+
+      if (key === 'd') this.tryShoot(this.p1, 'basic');
+      if (key === 'w') this.tryShoot(this.p1, 'strong');
+      if (this.mode === '2p') {
+        if (key === 'j') this.tryShoot(this.p2, 'basic');
+        if (key === 'k') this.tryShoot(this.p2, 'strong');
+      }
     };
     this.onKeyUp = (e) => { this.keys[e.key] = false; };
     window.addEventListener('keydown', this.onKeyDown);
@@ -112,6 +122,41 @@ export class ActionArena {
       player.grounded = false;
       player.jumping = true;
     }
+  }
+
+  tryShoot(player, type) {
+    if (!player || player.isCpu || player.hp <= 0 || this.gameOver) return;
+    const target = player === this.p1 ? this.p2 : this.p1;
+    if (target.hp <= 0) return;
+    this.playerShoot(player, target, type);
+  }
+
+  playerShoot(shooter, target, type) {
+    const now = performance.now();
+    const isStrong = type === 'strong';
+    const cdKey = isStrong ? 'strongShootCd' : 'basicShootCd';
+    const cooldown = isStrong ? 600 : 350;
+    if (now < shooter[cdKey]) return;
+    shooter[cdKey] = now + cooldown;
+
+    const sx = shooter.x + shooter.w / 2;
+    const sy = shooter.y + shooter.h / 2;
+    const tx = target.x + target.w / 2;
+    const ty = target.y + target.h / 2;
+    const angle = Math.atan2(ty - sy, tx - sx);
+    const speed = isStrong ? 9 : 7;
+    const damage = isStrong ? 35 : 22;
+
+    this.projectiles.push({
+      x: sx,
+      y: sy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      r: isStrong ? 14 : 10,
+      owner: shooter,
+      damage,
+      isStrong,
+    });
   }
 
   start() {
@@ -253,7 +298,6 @@ export class ActionArena {
       if (player.hp <= 0) return;
       this.foods = this.foods.filter((food) => {
         if (!this.playerHitsFood(player, food)) return true;
-        const healed = Math.min(food.heal, player.maxHp - player.hp);
         player.hp = Math.min(player.maxHp, player.hp + food.heal);
         this.pickupTexts.push({
           x: food.x + food.size / 2,
@@ -327,7 +371,7 @@ export class ActionArena {
     this.projectiles = this.projectiles.filter((pr) => {
       pr.x += pr.vx;
       pr.y += pr.vy;
-      if (pr.x < -20 || pr.x > ARENA_W + 20) return false;
+      if (pr.x < -20 || pr.x > ARENA_W + 20 || pr.y < -20 || pr.y > ARENA_H + 20) return false;
 
       const target = pr.owner === this.p1 ? this.p2 : this.p1;
       if (target.hp <= 0) return false;
@@ -377,10 +421,12 @@ export class ActionArena {
     this.projectiles.forEach((pr) => {
       ctx.beginPath();
       ctx.arc(pr.x, pr.y, pr.r, 0, Math.PI * 2);
-      ctx.fillStyle = pr.owner === this.p1 ? '#FF6B9D' : '#9B59B6';
+      ctx.fillStyle = pr.isStrong
+        ? (pr.owner === this.p1 ? '#FF3366' : '#7B2D8E')
+        : (pr.owner === this.p1 ? '#FF6B9D' : '#9B59B6');
       ctx.fill();
-      ctx.strokeStyle = 'white';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = pr.isStrong ? '#FFD700' : 'white';
+      ctx.lineWidth = pr.isStrong ? 3 : 2;
       ctx.stroke();
     });
 

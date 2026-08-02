@@ -150,9 +150,9 @@ function startBattle() {
 
   const hint = document.getElementById('controls-hint');
   if (gameMode === '1p') {
-    hint.textContent = '↑↓←→ 移動 | Space 跳躍閃避 | 吃食物回血！🍫+5 🍗+3 🍓+2 🍎+1';
+    hint.textContent = '↑↓←→ 移動 | D 攻擊 | W 強攻 | Space 跳躍 | 吃食物回血！';
   } else {
-    hint.textContent = '玩家1：方向鍵移動 + Space跳躍 | 玩家2：WASD移動 + Shift跳躍';
+    hint.textContent = '玩家1：方向鍵移動 D攻擊 W強攻 Space跳躍 | 玩家2：WASD移動 J攻擊 K強攻 Shift跳躍';
   }
 
   if (arena) arena.stop();
@@ -170,6 +170,12 @@ function startBattle() {
 function initBattleControls() {
   document.getElementById('btn-jump').addEventListener('click', () => {
     if (arena?.running) arena.tryJump(arena.p1);
+  });
+  document.getElementById('btn-shoot-d').addEventListener('click', () => {
+    if (arena?.running) arena.tryShoot(arena.p1, 'basic');
+  });
+  document.getElementById('btn-shoot-w').addEventListener('click', () => {
+    if (arena?.running) arena.tryShoot(arena.p1, 'strong');
   });
 
   document.getElementById('confirm-characters').addEventListener('click', startBattle);
