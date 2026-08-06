@@ -1,0 +1,8 @@
+{
+  "name": "sanrio-battle",
+  "version": "1.0.0",
+  "description": "萌萌可愛大亂鬥 - Cute character battle game",
+  "scripts": {
+    "start": "npx serve ."
+  }
+}

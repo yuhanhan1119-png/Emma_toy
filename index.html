@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>萌萌可愛大亂鬥 ✨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="game-container">
+    <!-- Opening Scene (optional, from main menu) -->
+    <section id="opening-scene" class="screen">
+      <div class="sky">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div class="sparkle s1">✦</div>
+        <div class="sparkle s2">✧</div>
+        <div class="sparkle s3">★</div>
+        <div class="sparkle s4">✦</div>
+      </div>
+      <div class="ground"></div>
+      <div class="opening-characters">
+        <div class="char-card" data-char="pompompurin">
+          <div class="char-sprite pompompurin"></div>
+          <span class="char-name">布丁狗</span>
+        </div>
+        <div class="char-card" data-char="cinnamoroll">
+          <div class="char-sprite cinnamoroll"></div>
+          <span class="char-name">大耳狗</span>
+        </div>
+        <div class="char-card" data-char="hellokitty">
+          <div class="char-sprite hellokitty"></div>
+          <span class="char-name">Hello Kitty</span>
+        </div>
+        <div class="char-card" data-char="kuromi">
+          <div class="char-sprite kuromi"></div>
+          <span class="char-name">酷洛米</span>
+        </div>
+        <div class="char-card" data-char="mymelody">
+          <div class="char-sprite mymelody"></div>
+          <span class="char-name">美樂蒂</span>
+        </div>
+      </div>
+      <div class="opening-title">
+        <h1>萌萌可愛大亂鬥</h1>
+        <p class="subtitle">可愛夥伴們的冒險開始了！</p>
+      </div>
+      <button id="skip-opening" class="btn-skip">按 Enter 或點擊繼續 →</button>
+    </section>
+
+    <!-- Main Menu (start screen) -->
+    <section id="main-menu" class="screen active">
+      <div class="menu-bg"></div>
+      <div class="menu-characters">
+        <div class="menu-char" data-char="pompompurin"><div class="char-sprite"></div><span>布丁狗</span></div>
+        <div class="menu-char" data-char="cinnamoroll"><div class="char-sprite"></div><span>大耳狗</span></div>
+        <div class="menu-char" data-char="hellokitty"><div class="char-sprite"></div><span>Hello Kitty</span></div>
+        <div class="menu-char" data-char="kuromi"><div class="char-sprite"></div><span>酷洛米</span></div>
+        <div class="menu-char" data-char="mymelody"><div class="char-sprite"></div><span>美樂蒂</span></div>
+      </div>
+      <h1 class="menu-title">萌萌可愛大亂鬥</h1>
+      <div class="menu-buttons">
+        <button class="btn-menu" data-mode="1p">🎮 單人對戰（vs 電腦）</button>
+        <button class="btn-menu" data-mode="2p">👫 雙人對戰</button>
+      </div>
+      <p class="menu-hint">選擇模式 → 挑選角色 → 開始動作對戰！</p>
+      <button id="watch-intro" class="btn-back">✨ 觀看開場動畫</button>
+    </section>
+
+    <!-- Character Select -->
+    <section id="char-select" class="screen">
+      <h2 id="select-title">選擇角色</h2>
+      <div id="select-panels">
+        <div class="select-panel" id="panel-p1">
+          <h3 id="panel-p1-label">選擇你的角色</h3>
+          <div class="char-grid" id="grid-p1"></div>
+        </div>
+        <div class="select-panel hidden" id="panel-p2">
+          <h3>玩家 2</h3>
+          <div class="char-grid" id="grid-p2"></div>
+        </div>
+        <div class="select-panel hidden" id="panel-cpu">
+          <h3>電腦對手</h3>
+          <div class="cpu-preview" id="cpu-preview">
+            <div class="cpu-mystery">🤖</div>
+            <div class="cpu-info">
+              <span class="char-select-name">？？？</span>
+              <span class="cpu-label">開戰時電腦將隨機選擇角色</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button id="confirm-characters" class="btn-start" disabled>開始戰鬥！</button>
+      <button id="back-to-menu" class="btn-back">← 返回主選單</button>
+    </section>
+
+    <!-- Battle Screen (Action Arena) -->
+    <section id="battle-screen" class="screen">
+      <div class="arena-hud">
+        <div class="hud-player" id="hud-p1">
+          <span class="hud-name" id="name-left"></span>
+          <div class="hp-bar arena-hp"><div class="hp-fill" id="hp-left"></div></div>
+          <span class="hp-text" id="hp-text-left">200/200</span>
+        </div>
+        <div class="hud-vs">VS</div>
+        <div class="hud-player" id="hud-p2">
+          <span class="hud-name" id="name-right"></span>
+          <div class="hp-bar arena-hp"><div class="hp-fill" id="hp-right"></div></div>
+          <span class="hp-text" id="hp-text-right">200/200</span>
+        </div>
+      </div>
+      <div class="energy-panel" id="energy-panel">
+        <span class="energy-label">大絕能量</span>
+        <div class="energy-bar" id="energy-bar">
+          <div class="energy-segment"></div>
+          <div class="energy-segment"></div>
+          <div class="energy-segment"></div>
+          <div class="energy-segment"></div>
+          <div class="energy-segment"></div>
+        </div>
+        <span class="energy-hint" id="energy-hint">0/5 — 連續攻擊 5 次後按 W 發動大絕</span>
+      </div>
+      <div class="arena-stage">
+        <canvas id="arena-canvas" width="900" height="520"></canvas>
+      </div>
+      <div class="arena-controls">
+        <p class="battle-controls-hint" id="controls-hint"></p>
+        <div class="arena-controls-buttons">
+        <button id="btn-shoot-d" class="btn-action">⚔️ 攻擊 (D)</button>
+        <button id="btn-shoot-w" class="btn-action" disabled>🔥 大絕 (W)</button>
+        <button id="btn-jump" class="btn-action">⬆️ 跳躍 (Space)</button>
+        </div>
+      </div>
+      <div class="battle-result hidden" id="battle-result">
+        <h2 id="winner-text"></h2>
+        <p id="result-detail"></p>
+        <button id="rematch" class="btn-menu">再戰一局</button>
+        <button id="to-menu" class="btn-back">返回主選單</button>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
